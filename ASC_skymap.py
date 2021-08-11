@@ -126,10 +126,10 @@ date_local  = date_UTC.astimezone(tz)
 # plot parameters
 image_size = 1.6
 #side_space = 6
-fig = plt.figure(figsize=(image_size*7.2,image_size*11.8), facecolor='black')
+fig = plt.figure(figsize=(image_size*7.2,image_size*11.85), facecolor='black')
 fig.subplots_adjust(0,0,1,1,0,0)
 
-gs = matplotlib.gridspec.GridSpec(4, 2, wspace=0, hspace=0, width_ratios=[1,1], height_ratios=[720,180,180,100])
+gs = matplotlib.gridspec.GridSpec(4, 2, wspace=0, hspace=0, width_ratios=[1,1], height_ratios=[720,180,180,105])
 
 ax0 = plt.subplot(gs[0, :])
 ax0.set_facecolor('black')
@@ -599,7 +599,7 @@ def plot_solar():
     ax0.annotate('VENUS',(-40,min(twlight.y)-25),color=solar_color[3],ha='center',va='top')
     ax0.annotate('$\u2642$',(Mars_x+2.5,Mars_y+1),color=solar_color[4])
     ax0.annotate('$\u2642$',(0,min(twlight.y)-15),color=solar_color[4],ha='center',va='top')
-    ax0.annotate('MARS',(0,min(twlight.y)-15),color=solar_color[4],ha='center',va='top')
+    ax0.annotate('MARS',(0,min(twlight.y)-25),color=solar_color[4],ha='center',va='top')
     ax0.annotate('$\u2643$',(Jupiter_x+2.5,Jupiter_y+1),color=solar_color[5])
     ax0.annotate('$\u2643$',(40,min(twlight.y)-15),color=solar_color[5],ha='center',va='top')
     ax0.annotate('JUPITER',(40,min(twlight.y)-25),color=solar_color[5],ha='center',va='top')
@@ -971,7 +971,7 @@ def write_label(x,y,z,c1,c2,c3): # (x,y) are text offset, z is zorder, (c1,c2,c3
         timelog('timestamp')
     #print('label:'+str(date_local))
     ax0.annotate(Obs[4]+'\n'+Obs[6],(hori_xmin+x,hori_ymax+y),ha='left',va='top',color=c1,zorder=12+2.5+z)
-    ax0.annotate(Obs[3]+'\n'+Obs[5],(hori_xmin+x+90,hori_ymax+y),ha='right',va='top',color=c1,zorder=12+2.5+z)
+    ax0.annotate(Obs[3]+'\n'+Obs[5],(hori_xmin+x+60,hori_ymax+y),ha='right',va='top',color=c1,zorder=12+2.5+z)
     ax0.annotate('Ho Koon Nature Education cum\nAstronomical Centre',(hori_xmax+x,hori_ymax+y),ha='right',va='top',color=c1,zorder=12+2.5+z)
     ax0.annotate('HKT\n\n',(hori_xmax+x,hori_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
     ax0.annotate(str(date_local.strftime('%H:%M:%S\n')),(hori_xmax+x,hori_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
@@ -995,30 +995,6 @@ def write_weather():
     timelog('weather report')
     
     socket.setdefaulttimeout(5)
-    
-    # BesutifulSoup, for temp & RH
-    try:
-        link_w = 'http://www.weather.gov.hk/wxinfo/ts/text_readings_e.htm'
-        html_w = requests.get(link_w).text
-        soup_w = BeautifulSoup(html_w, 'html.parser')
-    except:
-        print('HKO Regional Weather fail')
-        pass
-
-    Tw1 = time.time()
-
-    #RSS from HKO, for UV & icon
-    try:
-        feed = feedparser.parse('https://rss.weather.gov.hk/rss/CurrentWeather.xml')
-        urlretrieve(re.search('(?P<url>https?://[^\s"\"]+)', feed.entries[0]['summary']).group('url'), 'weather_icon.png')
-        weather_icon = Image.open('weather_icon.png')
-        ax0.imshow(weather_icon, extent=(310,360,190,240))
-        
-    except:
-        print('HKO RSS fail')
-        pass
-
-    Tw2 = time.time()
 
     # BesutifulSoup, for sunspot
     try:
@@ -1036,86 +1012,14 @@ def write_weather():
         except:
             print('spaceweather fail')
         pass
-
-    Tw3 = time.time()
     
-    #temp
-    try:
-        HK_temp = re.search(r'(.*Tsuen\sWan\sHo\sKoon.*)', soup_w.get_text()).group(0).split()[4].replace('*/','')
-
-        temp_cmap = matplotlib.cm.get_cmap('coolwarm')
-        ax0.annotate('air temp.: ',(310,190),ha='left',va='top',fontproperties=DjV_S_8,color='darkgrey')
-        ax0.annotate(HK_temp+'$\u00B0$C',(360,184),ha='right',va='top',fontproperties=DjV_S_12,\
-                     color=temp_cmap(numpy.clip(float(HK_temp)/40,0,1)))
-
-        # record temp
-        CC_hokoon.update(pandas.DataFrame({'temp':float(HK_temp)},index=[CC_hokoon.index[-1]]))
-
-    except:
-        print('HKO temp fail')
-        ax0.annotate('Maintenance',(360,184),ha='right',va='top',fontproperties=DjV_S_12,color='r')
-
-    #RH
-    try:
-        HK_RH = re.search(r'(.*Tsuen\sWan\sHo\sKoon.*)', soup_w.get_text()).group(0).split()[5]
-        
-        ax0.annotate('R.H.: ',(310,170),ha='left',va='top',fontproperties=DjV_S_8,color='darkgrey')
-        RH_wedge = patches.Wedge((328,160),4,(100-float(HK_RH))/100*360+90,360+90,width=2,edgecolor='none')
-        ax0.add_patch(RH_wedge)
-        ax0.annotate(HK_RH+'%',(360,164),ha='right',va='top',fontproperties=DjV_S_12,color='w')
-
-    except:
-        try:
-            HK_RH = re.search(r'(.*)Relative Humidity : (.*?) .*', feed.entries[0]['summary']).group(2).replace('<br/>','').replace('<br','')
-        
-            ax0.annotate('R.H.: ',(310,170),ha='left',va='top',fontproperties=DjV_S_8,color='darkgrey')
-            RH_wedge = patches.Wedge((328,160),4,(100-float(HK_RH))/100*360+90,360+90,width=2,edgecolor='none')
-            ax0.add_patch(RH_wedge)
-            ax0.annotate(HK_RH+'%',(360,164),ha='right',va='top',fontproperties=DjV_S_12,color='w')
-        
-        except:
-            print('HKO RH fail')
-            ax0.annotate('Maintenance',(360,164),ha='right',va='top',fontproperties=DjV_S_12,color='r')
-
-    #UV
-    try:
-        HK_UV = re.search(r'(.*)Intensity of UV radiation : (.*?) .*', feed.entries[0]['summary']).group(2).replace('<br/>','').replace('<br','')
-        ax0.annotate('UV intensity: ',(310,150),ha='left',va='top',fontproperties=DjV_S_8,color='darkgrey')
-        ax0.annotate(str(HK_UV),(360,144),ha='right',va='top',fontproperties=DjV_S_12,color='w')
-        if str(HK_UV) == 'high':
-            ax0.annotate('(⌐■_■)☂',(335,134),ha='center',va='top',fontproperties=DjV_S_12,color='w')
-        elif str(HK_UV) == 'moderate':
-            ax0.annotate('(⌐■_■)',(335,134),ha='center',va='top',fontproperties=DjV_S_12,color='w')
-        elif str(HK_UV) == 'low':
-            ax0.annotate('(⌐⊡_⊡)',(335,134),ha='center',va='top',fontproperties=DjV_S_12,color='w')
-        elif str(HK_UV) == 'very':
-            ax0.annotate('HIGH',(335,134),ha='center',va='top',fontproperties=DjV_S_12,color='r')
-        elif str(HK_UV) == 'extreme':
-            ax0.annotate('HELP!!',(335,134),ha='center',va='top',fontproperties=DjV_S_12,color='r')
-
     #sunspot
-        ax0.annotate('Sunspot: ',(310,120),ha='left',va='top',fontproperties=DjV_S_8,color='darkgrey')
-        ax0.annotate(SW_ss,(360,114),ha='right',va='top',fontproperties=DjV_S_12,color='w')
+    try:
+        ax5.annotate('Sunspot no.',(1320,49),ha='center',va='center',fontproperties=DjV_S_10,color='darkgrey')
+        ax5.annotate(SW_ss,(1320,19),ha='center',va='center',fontproperties=DjV_S_10,color='w')
     except:
         print('no sun la')
         pass
-    
-#     #bus 51
-#     try:
-#         link_bus = 'https://data.etabus.gov.hk/v1/transport/kmb/stop-eta/F4B90466198A6DA7'
-#         html_bus = requests.get(link_bus).text
-#         busETA = datetime.strptime(eval(html_bus)['data'][0]['eta'],'%Y-%m-%dT%H:%M:%S+08:00')
-#         
-#         ax0.annotate('next KMB 51\nestimated time of arrival:\n'+
-#                      str(busETA.time())+'\n'+
-#                      str('{:.1f}'.format((busETA-datetime.now()).total_seconds()/60))+
-#                      ' \u00B1 1 mins left',(-358,220),ha='left',va='top',fontproperties=DjV_S_12,color='w')
-#     except:
-#         print('cant get bus info')
-    
-    #print(Tw1-Tw0)
-    #print(Tw2-Tw1)
-    #print(Tw3-Tw2)
     
 def update_para():
     global transform_x, transform_y, ra0, dec0, plot_scale, sidereal_time
@@ -1141,10 +1045,10 @@ def update_para():
 def plot_ASC():
     # show image
     #ax0.imshow(asc, extent=[-360, 360, -240, 240])
-    ax0.set_xlim((-360,360))
-    ax0.set_ylim((-360,360))
+    ax0.set_xlim((-300,300))
+    ax0.set_ylim((-300,300))
     ax0.axis('off')
-    ax0.add_patch(patches.Rectangle((-360,-360),720,720,fc='none',ec=(1,1,0,0.75),lw=2))
+    ax0.add_patch(patches.Rectangle((-300,-300),600,600,fc='none',ec=(1,1,0,0.75),lw=2))
     
     plot_solar()
     plot_constellation()
@@ -1157,9 +1061,7 @@ def side_panel():
     moon_phase()
     jovian_moons()
     mercury_venus()
-    #cloud_detection()
     ephemeris()
-    #past_24h_stat()
     
 def moon_phase(): #ax1
     Tmp0 = time.time()
@@ -1340,56 +1242,56 @@ def moon_phase(): #ax1
         ax1.annotate('N',(ph_l*math.sin(Moon_parallactic_angle),ph_l*math.cos(Moon_parallactic_angle)),\
                      xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
         ax1.plot([ph_r*math.sin(Moon_parallactic_angle),ph_R*math.sin(Moon_parallactic_angle)],\
-                 [ph_r*math.cos(Moon_parallactic_angle),ph_R*math.cos(Moon_parallactic_angle)],color='red')
+                 [ph_r*math.cos(Moon_parallactic_angle),ph_R*math.cos(Moon_parallactic_angle)],color='red',zorder=10)
         
         ax1.annotate('E',(ph_l*math.sin(Moon_parallactic_angle+3*math.pi/2),ph_l*math.cos(Moon_parallactic_angle+3*math.pi/2)),\
                      xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
         ax1.plot([ph_r*math.sin(Moon_parallactic_angle+3*math.pi/2),ph_R*math.sin(Moon_parallactic_angle+3*math.pi/2)],\
-                 [ph_r*math.cos(Moon_parallactic_angle+3*math.pi/2),ph_R*math.cos(Moon_parallactic_angle+3*math.pi/2)],color='red')
+                 [ph_r*math.cos(Moon_parallactic_angle+3*math.pi/2),ph_R*math.cos(Moon_parallactic_angle+3*math.pi/2)],color='red',zorder=10)
         
         ax1.annotate('S',(ph_l*math.sin(Moon_parallactic_angle+math.pi),ph_l*math.cos(Moon_parallactic_angle+math.pi)),\
                      xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
         ax1.plot([ph_r*math.sin(Moon_parallactic_angle+math.pi),ph_R*math.sin(Moon_parallactic_angle+math.pi)],\
-                 [ph_r*math.cos(Moon_parallactic_angle+math.pi),ph_R*math.cos(Moon_parallactic_angle+math.pi)],color='red')
+                 [ph_r*math.cos(Moon_parallactic_angle+math.pi),ph_R*math.cos(Moon_parallactic_angle+math.pi)],color='red',zorder=10)
         
         ax1.annotate('W',(ph_l*math.sin(Moon_parallactic_angle+math.pi/2),ph_l*math.cos(Moon_parallactic_angle+math.pi/2)),\
                      xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
         ax1.plot([ph_r*math.sin(Moon_parallactic_angle+math.pi/2),ph_R*math.sin(Moon_parallactic_angle+math.pi/2)],\
-                 [ph_r*math.cos(Moon_parallactic_angle+math.pi/2),ph_R*math.cos(Moon_parallactic_angle+math.pi/2)],color='red')
+                 [ph_r*math.cos(Moon_parallactic_angle+math.pi/2),ph_R*math.cos(Moon_parallactic_angle+math.pi/2)],color='red',zorder=10)
 
-    ax1.annotate('eq \ncoord.',(-88,-70),xycoords=('data'),ha='left',va='bottom',fontproperties=DjV_S_9,color='red')
+    ax1.annotate('equatorial\ncoordinate',(-88,-70),xycoords=('data'),ha='left',va='bottom',fontproperties=DjV_S_9,color='red')
 
     # selenographic
-    ax1.annotate('seleno-\ngraphic',(88,-70),xycoords=('data'),ha='right',va='bottom',fontproperties=DjV_S_9,color='cyan')
+    ax1.annotate('selenographic\ncoordinate',(88,-70),xycoords=('data'),ha='right',va='bottom',fontproperties=DjV_S_9,color='cyan')
 
     ax1.annotate('N',(ph_l*math.sin(PA_axis_moon_z),ph_l*math.cos(PA_axis_moon_z)),\
                  xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
     ax1.plot([ph_r*math.sin(PA_axis_moon_z),ph_R*math.sin(PA_axis_moon_z)],\
-             [ph_r*math.cos(PA_axis_moon_z),ph_R*math.cos(PA_axis_moon_z)],color='cyan')
+             [ph_r*math.cos(PA_axis_moon_z),ph_R*math.cos(PA_axis_moon_z)],color='cyan',zorder=10)
     
     ax1.annotate('E',(ph_l*math.sin(PA_axis_moon_z+math.pi/2),ph_l*math.cos(PA_axis_moon_z+math.pi/2)),\
                  xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
     ax1.plot([ph_r*math.sin(PA_axis_moon_z+math.pi/2),ph_R*math.sin(PA_axis_moon_z+math.pi/2)],\
-             [ph_r*math.cos(PA_axis_moon_z+math.pi/2),ph_R*math.cos(PA_axis_moon_z+math.pi/2)],color='cyan')
+             [ph_r*math.cos(PA_axis_moon_z+math.pi/2),ph_R*math.cos(PA_axis_moon_z+math.pi/2)],color='cyan',zorder=10)
     
     ax1.annotate('S',(ph_l*math.sin(PA_axis_moon_z+math.pi),ph_l*math.cos(PA_axis_moon_z+math.pi)),\
                  xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
     ax1.plot([ph_r*math.sin(PA_axis_moon_z+math.pi),ph_R*math.sin(PA_axis_moon_z+math.pi)],\
-             [ph_r*math.cos(PA_axis_moon_z+math.pi),ph_R*math.cos(PA_axis_moon_z+math.pi)],color='cyan')
+             [ph_r*math.cos(PA_axis_moon_z+math.pi),ph_R*math.cos(PA_axis_moon_z+math.pi)],color='cyan',zorder=10)
     
     ax1.annotate('W',(ph_l*math.sin(PA_axis_moon_z+3*math.pi/2),ph_l*math.cos(PA_axis_moon_z+3*math.pi/2)),\
                  xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
     ax1.plot([ph_r*math.sin(PA_axis_moon_z+3*math.pi/2),ph_R*math.sin(PA_axis_moon_z+3*math.pi/2)],\
-             [ph_r*math.cos(PA_axis_moon_z+3*math.pi/2),ph_R*math.cos(PA_axis_moon_z+3*math.pi/2)],color='cyan')
+             [ph_r*math.cos(PA_axis_moon_z+3*math.pi/2),ph_R*math.cos(PA_axis_moon_z+3*math.pi/2)],color='cyan',zorder=10)
     
     # zenith
     if moon_vector.altaz()[0].degrees > 0:
         ax1.arrow(0,M_d/2,0,10,color='green',head_width=5, head_length=5)
         ax1.annotate('dia = '+str(round(moon_size/60,1))+"'\nele = "+str(round(moon_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',
-                     (88,70),xycoords=('data'),ha='right',va='top',fontproperties=DjV_S_9,color='orange')
+                     (88,70),xycoords=('data'),ha='right',va='top',fontproperties=DjV_S_12,color='orange')
     else:
-        ax1.annotate('below horizon',(88,70),xycoords=('data'),ha='right',va='top',fontproperties=DjV_S_9,color='orange')
-    ax1.annotate('zenith',(-88,70),xycoords=('data'),ha='left',va='top',fontproperties=DjV_S_9,color='green')
+        ax1.annotate('below horizon',(88,70),xycoords=('data'),ha='right',va='top',fontproperties=DjV_S_12,color='orange')
+    ax1.annotate('zenith',(0,68),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_12,color='green')
     
     phase_moon = 'illuminated '+str(round(Moon_percent*100,2))+'%' # projected 2D apparent area
     if Moon_percent >= 0:
@@ -1427,12 +1329,12 @@ def jovian_moons(): #ax2
     Ganymede_y  = (dec_ga.radians - dec_J.radians)*dis_J.km/71492
     Callisto_x  = (ra_ca.radians - ra_J.radians)*math.cos(dec_J.radians)*dis_J.km/71492
     Callisto_y  = (dec_ca.radians - dec_J.radians)*dis_J.km/71492
-    
+        
     Io_radius = 1821.6/71492
     Europa_radius = 1560.8/71492
     Ganymede_radius = 2410.3/71492
     Callisto_radius = 2634.1/71492
-    jov_radius = 90/(1+max(abs(Io_x-Io_radius),abs(Io_x+Io_radius),
+    jov_radius = 88/(1+max(abs(Io_x-Io_radius),abs(Io_x+Io_radius),
                            abs(Europa_x-Europa_radius),abs(Europa_x+Europa_radius),
                            abs(Ganymede_x-Ganymede_radius),abs(Ganymede_x+Ganymede_radius),
                            abs(Callisto_x-Callisto_radius),abs(Callisto_x+Callisto_radius)))
@@ -1448,10 +1350,10 @@ def jovian_moons(): #ax2
     Ganymededisc = patches.Circle((-Ganymede_x*jov_radius,Ganymede_y*jov_radius), Ga_r, color='#544a45', zorder=-dis_ga.km)
     Callistodisc = patches.Circle((-Callisto_x*jov_radius,Callisto_y*jov_radius), Ca_r, color='#766b5d', zorder=-dis_ca.km)
     
-    ax2.annotate('I',(-Io_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_8,color='#9f9538')
-    ax2.annotate('E',(-Europa_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_8,color='#6c5d40')
-    ax2.annotate('G',(-Ganymede_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_8,color='#544a45')
-    ax2.annotate('C',(-Callisto_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_8,color='#766b5d')
+    ax2.annotate('I',(-Io_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_12,color='#9f9538')
+    ax2.annotate('E',(-Europa_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_12,color='#6c5d40')
+    ax2.annotate('G',(-Ganymede_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_12,color='#544a45')
+    ax2.annotate('C',(-Callisto_x*jov_radius,-30),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_12,color='#766b5d')
     
     ax2.add_patch(Jupdisc)
     ax2.add_patch(Iodisc)
@@ -1459,8 +1361,16 @@ def jovian_moons(): #ax2
     ax2.add_patch(Ganymededisc)
     ax2.add_patch(Callistodisc)
     
-    ax2.annotate('\u2190 E',(-90,-40),xycoords=('data'),ha='left',va='bottom',fontproperties=DjV_S_10,color='red')
-    ax2.annotate('W \u2192',(90,-40),xycoords=('data'),ha='right',va='bottom',fontproperties=DjV_S_10,color='red')
+    ax2.annotate('\u2190 E',(-88,-40),xycoords=('data'),ha='left',va='bottom',fontproperties=DjV_S_10,color='red')
+    ax2.annotate('W \u2192',(88,-40),xycoords=('data'),ha='right',va='bottom',fontproperties=DjV_S_10,color='red')
+    
+    #FOV 5 arcmin
+    for i in range(5):
+        ax2.add_patch(patches.Circle((0,0),i*5*math.pi/180/60/2*dis_J.km/71492*jov_radius,
+                                     fc='none',ec=(1,0,0,0.35),ls='--',zorder=-dis_J.km*2))
+        ax2.annotate(str(5*i)+"'",(i*5*math.pi/180/60/2*dis_J.km/71492*jov_radius*math.cos(math.radians(25)),
+                                   i*5*math.pi/180/60/2*dis_J.km/71492*jov_radius*math.sin(math.radians(25))),
+                     rotation=-65,ha='center',va='center',color=(1,0,0,0.75), backgroundcolor= 'black', zorder=-dis_J.km*2+1)
 
     Tj1 = time.time()
     #print(Tj1-Tj0)
@@ -1483,13 +1393,14 @@ def mercury_venus(): #ax3
                                         math.sin(sun_vector.radec()[1].radians)*math.cos(venus_vector.radec()[1].radians)
                                         -math.cos(sun_vector.radec()[1].radians)*math.sin(venus_vector.radec()[1].radians)*math.cos(sun_vector.radec()[0].radians-venus_vector.radec()[0].radians))) % 360
 
-    ax3.annotate('Mercury & Venus',(0,40),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
-
     Mercury_offsetx = -45
     Venus_offsetx = 45
     MV_d = 30
     rot_pa_limb_mercury = mercury_chi-90
     rot_pa_limb_venus = venus_chi-90
+
+    ax3.annotate('Mercury',(Mercury_offsetx,40),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    ax3.annotate('Venus',(Venus_offsetx,40),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
 
     Mercury_precent = almanac.fraction_illuminated(ephem, 'mercury', date_UTC)
     Venus_percent = almanac.fraction_illuminated(ephem, 'venus', date_UTC)
@@ -1545,160 +1456,190 @@ def mercury_venus(): #ax3
     ax3.add_patch(Vendisc2)
 
     dist_SM = math.degrees(math.acos(math.sin(sun_vector.radec()[1].radians)*math.sin(mercury_vector.radec()[1].radians)+math.cos(sun_vector.radec()[1].radians)*math.cos(mercury_vector.radec()[1].radians)*math.cos(sun_vector.radec()[0].radians-mercury_vector.radec()[0].radians)))
-    ax3.annotate(str(round(dist_SM,1))+u'\N{DEGREE SIGN}',(Mercury_offsetx,0),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_8,color='#FFCC33')
-    dist_SV = math.degrees(math.acos(math.sin(sun_vector.radec()[1].radians)*math.sin(venus_vector.radec()[1].radians)+math.cos(sun_vector.radec()[1].radians)*math.cos(venus_vector.radec()[1].radians)*math.cos(sun_vector.radec()[0].radians-venus_vector.radec()[0].radians)))
-    ax3.annotate(str(round(dist_SV,1))+u'\N{DEGREE SIGN}',(Venus_offsetx,0),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_8,color='#FFCC33')
+    ax3.annotate(str(round(dist_SM,1))+u'\N{DEGREE SIGN}\nfrom Sun',(Mercury_offsetx,-25),xycoords=('data'),
+                 ha='center',va='center',fontproperties=DjV_S_8,color='#FFCC33')
+    if rot_pa_limb_mercury != 0:
+        ax3.arrow((MV_d/2-2)*math.sin(math.radians(270-rot_pa_limb_mercury))+Mercury_offsetx,(MV_d/2-2)*math.cos(math.radians(270-rot_pa_limb_mercury)),\
+                  (dist_SM/3+2)*math.sin(math.radians(270-rot_pa_limb_mercury)),(dist_SM/3+2)*math.cos(math.radians(270-rot_pa_limb_mercury)),
+                  shape='full',length_includes_head=True,head_width=1,color='#FFCC33')
     
-    ax3.annotate('\u2190 E',(-90,-40),xycoords=('data'),ha='left',va='bottom',fontproperties=DjV_S_10,color='red')
-    ax3.annotate('dist. from Sun',(0,-40),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_8,color='#FFCC33')
-    ax3.annotate('W \u2192',(90,-40),xycoords=('data'),ha='right',va='bottom',fontproperties=DjV_S_10,color='red')
+    dist_SV = math.degrees(math.acos(math.sin(sun_vector.radec()[1].radians)*math.sin(venus_vector.radec()[1].radians)+math.cos(sun_vector.radec()[1].radians)*math.cos(venus_vector.radec()[1].radians)*math.cos(sun_vector.radec()[0].radians-venus_vector.radec()[0].radians)))
+    ax3.annotate(str(round(dist_SV,1))+u'\N{DEGREE SIGN}\nfrom Sun',(Venus_offsetx,-25),xycoords=('data'),
+                 ha='center',va='center',fontproperties=DjV_S_8,color='#FFCC33')
+    if rot_pa_limb_venus != 0:
+        ax3.arrow((MV_d/2-2)*math.sin(math.radians(270-rot_pa_limb_venus))+Venus_offsetx,(MV_d/2-2)*math.cos(math.radians(270-rot_pa_limb_venus)),\
+                  (dist_SV/3+2)*math.sin(math.radians(270-rot_pa_limb_venus)),(dist_SV/3+2)*math.cos(math.radians(270-rot_pa_limb_venus)),
+                  shape='full',length_includes_head=True,head_width=1,color='#FFCC33')
+    
+    ax3.annotate('illuminated '+str(round(Mercury_precent*100,2))+'%',(Mercury_offsetx,-35),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#F0F0F0')
+    ax3.annotate('illuminated '+str(round(Venus_percent*100,2))+'%',(Venus_offsetx,-35),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#F0F0F0')
+    
+    ax3.annotate('\u2190 E',(-88,-40),xycoords=('data'),ha='left',va='bottom',fontproperties=DjV_S_10,color='red')
+    #ax3.annotate('dist. from Sun',(0,-40),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_8,color='#FFCC33')
+    ax3.annotate('W \u2192',(88,-40),xycoords=('data'),ha='right',va='bottom',fontproperties=DjV_S_10,color='red')
 
     Tmv1 = time.time()
     #print(Tmv1-Tmv0)
 
-# def cloud_detection(): #ax4
-#     Tcc0 = time.time()
-#     
-#     timelog('counting cloud')
-#     
-#     ax4.set_xlim((-90,90))
-#     ax4.set_ylim((-40,80))
-
 def ephemeris(): #ax5
     Tep0 = time.time()
+    
+    # PyEphem, as skyfield cant compute all mag
+    import ephem as PyEphem
+    PyEphem.Observer().lon = str(114+6/60+29/3600)
+    PyEphem.Observer().lat = str(22+23/60+1/3600)
+    PyEphem.Observer().date = datetime.utcnow().replace(second=0,microsecond=0)
 
     timelog('Ephemeris')
 
-    ax5.set_xlim((-90,90))
-    ax5.set_ylim((-140,140))
+    ax5.set_xlim((0,1440))
+    ax5.set_ylim((0,210))
     ax5.axis('off')
-    ax5.add_patch(patches.Rectangle((-90,-140),180,280,fc='none',ec=(1,1,0,0.75),lw=2))
+    ax5.add_patch(patches.Rectangle((0,0),1440,210,fc='none',ec=(1,1,0,0.75),lw=2))
     
-    ax5.annotate('Ephemeris',(0,135),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
-
-    sym_x = -85
-    rise_x = -40
-    set_x = 22.5
-    mag_x = 87.5
-    ax5.annotate('rise',(rise_x,105),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
-    ax5.annotate('set',(set_x,105),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
-    ax5.annotate('mag',(mag_x,105),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate('Ephemeris',(720,195),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    
+    sym_y = 171-24
+    rise_y = 133-18-6
+    set_y = 95-12-4
+    mag_y = 57-6-2
+    ele_y = 19
+    ax5.annotate('next rise',(120,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate('next set',(120,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate('magnitude',(120,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate('elevation',(120,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
     
     # Moon
-    moon_y = 85
+    moon_x = 300
     if moon_chi>180:
-        ax5.annotate('\u263D',(sym_x,moon_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#DAD9D7')
+        ax5.annotate('\u263D\nMoon',(moon_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#DAD9D7')
     else:
-        ax5.annotate('\u263E',(sym_x,moon_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#DAD9D7')
+        ax5.annotate('\u263E\nMoon',(moon_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#DAD9D7')
 
     t_moon, updown_moon = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, moon, Obs[0]-earth, radius_degrees=0.25))
     for ti, udi in list(zip(t_moon, updown_moon))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,moon_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(moon_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,moon_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
-
-##    ax5.annotate(str(round(Moon.mag,1)),(mag_x,moon_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(moon_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+    
+    moon_PE = PyEphem.Moon()
+    moon_PE.compute(PyEphem.Observer())  
+    ax5.annotate(str(round(moon_PE.mag,1)),(moon_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(moon_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(moon_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
     
     # Mercury
-    mercury_y = 65
-    ax5.annotate('\u263F',(sym_x,mercury_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#97979F')
+    mercury_x = 420
+    ax5.annotate('\u263F\nMercury',(mercury_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#97979F')
     
     t_mercury, updown_mercury = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, mercury, Obs[0]-earth))
     for ti, udi in list(zip(t_mercury, updown_mercury))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,mercury_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(mercury_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,mercury_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(mercury_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
 
-    ax5.annotate(str(round(planetary_magnitude(mercury_vector),1)),(mag_x,mercury_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
-
+    ax5.annotate(str(round(planetary_magnitude(mercury_vector),1)),(mercury_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(mercury_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(mercury_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
+    
     # Venus
-    venus_y = 45
-    ax5.annotate('\u2640',(sym_x,venus_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#C18F17')
+    venus_x = 540
+    ax5.annotate('\u2640\nVenus',(venus_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#C18F17')
     
     t_venus, updown_venus = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, venus, Obs[0]-earth))
     for ti, udi in list(zip(t_venus, updown_venus))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,venus_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(venus_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,venus_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(venus_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
 
-    ax5.annotate(str(round(planetary_magnitude(venus_vector),1)),(mag_x,venus_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
-
+    ax5.annotate(str(round(planetary_magnitude(venus_vector),1)),(venus_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(venus_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(venus_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
+    
     # Mars
-    mars_y = 25
-    ax5.annotate('\u2642',(sym_x,mars_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#E27B58')
+    mars_x = 660
+    ax5.annotate('\u2642\nMars',(mars_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#E27B58')
     
     t_mars, updown_mars = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, mars, Obs[0]-earth))
     for ti, udi in list(zip(t_mars, updown_mars))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,mars_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(mars_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,mars_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(mars_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
 
-##    ax5.annotate(str(round(planetary_magnitude(mars_vector),1)),(mag_x,mars_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
+    mars_PE = PyEphem.Mars()
+    mars_PE.compute(PyEphem.Observer())  
+    ax5.annotate(str(round(mars_PE.mag,1)),(mars_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(mars_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(mars_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
 
     # Jupiter
-    jupiter_y = 5
-    ax5.annotate('\u2643',(sym_x,jupiter_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#C88B3A')
+    jupiter_x = 780
+    ax5.annotate('\u2643\nJupiter',(jupiter_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#C88B3A')
     
     t_jupiter, updown_jupiter = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, jupiter, Obs[0]-earth))
     for ti, udi in list(zip(t_jupiter, updown_jupiter))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,jupiter_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(jupiter_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,jupiter_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(jupiter_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
 
-    ax5.annotate(str(round(planetary_magnitude(jupiter_vector),1)),(mag_x,jupiter_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(planetary_magnitude(jupiter_vector),1)),(jupiter_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(jupiter_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(jupiter_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
 
     # Saturn
-    saturn_y = -15
-    ax5.annotate('\u2644',(sym_x,saturn_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#A49B72')
+    saturn_x = 900
+    ax5.annotate('\u2644\nSaturn',(saturn_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#A49B72')
     
     t_saturn, updown_saturn = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, saturn, Obs[0]-earth))
     for ti, udi in list(zip(t_saturn, updown_saturn))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,saturn_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(saturn_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,saturn_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(saturn_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
 
-##    ax5.annotate(str(round(planetary_magnitude(saturn_vector),1)),(mag_x,saturn_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
+    saturn_PE = PyEphem.Saturn()
+    saturn_PE.compute(PyEphem.Observer())  
+    ax5.annotate(str(round(saturn_PE.mag,1)),(saturn_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(saturn_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(saturn_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
 
     # Uranus
-    uranus_y = -35
-    ax5.annotate('\u2645',(sym_x,uranus_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#D5FBFC')
+    uranus_x = 1020
+    ax5.annotate('\u2645\nUranus',(uranus_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#D5FBFC')
     
     t_uranus, updown_uranus = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, uranus, Obs[0]-earth))
     for ti, udi in list(zip(t_uranus, updown_uranus))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,uranus_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(uranus_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,uranus_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(uranus_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
 
-    ax5.annotate(str(round(planetary_magnitude(uranus_vector),1)),(mag_x,uranus_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(planetary_magnitude(uranus_vector),1)),(uranus_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(uranus_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(uranus_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
 
     # Neptune
-    neptune_y = -55
-    ax5.annotate('\u2646',(sym_x,neptune_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#3E66F9')
+    neptune_x = 1140
+    ax5.annotate('\u2646\nNeptune',(neptune_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#3E66F9')
     
     t_neptune, updown_neptune = find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),risings_and_settings(ephem, neptune, Obs[0]-earth))
     for ti, udi in list(zip(t_neptune, updown_neptune))[:2]:
         if udi == 1:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,neptune_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(neptune_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
         elif udi == 0:
-            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,neptune_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
-
-##    ax5.annotate(str(round(planetary_magnitude(neptune_vector),1)),(mag_x,neptune_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='yellow')
+            ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(neptune_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+    
+    neptune_PE = PyEphem.Neptune()
+    neptune_PE.compute(PyEphem.Observer())  
+    ax5.annotate(str(round((neptune_PE.mag),1)),(neptune_x,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='yellow')
+    ax5.annotate(str(round(neptune_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',(neptune_x,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='grey')
 
     ###################################################################################################################################################
     
     # astronomical twilight
 
-    ax5.annotate('Astronomical Twilight',(0,-75),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    #ax5.annotate('Astronomical Twilight',(0,-75),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
 
-    sun_y = -105
-    ax5.annotate('\u263C',(sym_x,sun_y),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_10,color='#FFCC33')
+    sun_x = 1320
+    ax5.annotate('Astronomical\nTwilight',(sun_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#FFCC33')
 
     t_twilight, updown_twilight = almanac.find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),
                                                         almanac.dark_twilight_day(ephem, Obs[0]-earth))
@@ -1706,81 +1647,26 @@ def ephemeris(): #ax5
     for ti, udi in list(zip(t_twilight, updown_twilight))[:8]:
         if udi == 1:
             if ti.astimezone(tz).hour <12:
-                ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(rise_x,sun_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+                ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(sun_x,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
             else:
-                ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(set_x,sun_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
+                ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(sun_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
                 
-    ax5.annotate('orange: today ',(0,-125),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_8,color='orange')
-    ax5.annotate(' green: +1day',(0,-125),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_8,color='green')
+    ax5.annotate('orange: today',(120,155),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_8,color='orange')
+    ax5.annotate('green: tomorrow',(120,135),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_8,color='green')
 
     Tep1 = time.time()
     #print(Tep1-Tep0)
 
-def past_24h_stat(): #ax6
-    T240 = time.time()
-
-    timelog('24Hr stat')
-        
-    ax6.set_xlim((24,0))
-    ax6.set_ylim((0,100))
-    ax6.axis('off')
-    
-    # time axis
-    def diff_hour(datetime1):
-        diff = datetime.now()-datetime1
-        return diff.days*24+diff.seconds/3600
-
-    back_hour = [0]*len(CC_hokoon['HKT'])
-    for i in range(len(CC_hokoon['HKT'])):
-        back_hour[i] = diff_hour(CC_hokoon['HKT'][i])
-        
-    # plot graph
-    for yc in [0,20,40,60,80,100]:
-        ax6.axhline(y=yc, color='w', linewidth=0.5, linestyle='--', alpha=0.5, zorder=2)
-
-    oclock = [0]*24
-    for i in range(24):
-        oclock[i] = diff_hour((datetime.now()-timedelta(hours=i)).replace(minute=0,second=0,microsecond=0))
-        ax6.axvline(x=oclock[i], color='w', linewidth=0.5, linestyle='--', alpha=0.5, zorder=2)
-        ax6.annotate(str((datetime.now()-timedelta(hours=i)).hour)+':00',(oclock[i],0),xycoords=('data'),\
-                     ha='center',va='bottom',fontproperties=DjV_S_8,color='w',alpha=0.5)
-    
-    # cloud coverage  
-    ax6.annotate('20%',(24,20),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_8,color='w',alpha=0.5)
-    ax6.annotate('40%',(24,40),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_8,color='w',alpha=0.5)
-    ax6.annotate('60%',(24,60),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_8,color='w',alpha=0.5)
-    ax6.annotate('80%',(24,80),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_8,color='w',alpha=0.5)
-
-    ax6.plot(back_hour,CC_hokoon['CC'],color='grey',linewidth=1,zorder=1)
-
-    # temp
-    temp_scale = 1.5
-    halfday = math.floor(len(CC_hokoon.index)/2)
-    temp_max = int(round(CC_hokoon['temp'].tail(n=halfday).mean())+5*temp_scale)
-    temp_min = int(round(CC_hokoon['temp'].tail(n=halfday).mean())-5*temp_scale)
-    temp_cmap = matplotlib.cm.get_cmap('coolwarm')
-    
-    for i in [1,2,3,4]:
-        ax6.annotate(str(int(temp_max-2*i*temp_scale))+u'\u00B0C',(0,100-20*i),xycoords=('data'),ha='right',va='center',\
-                     fontproperties=DjV_S_8,color=temp_cmap(numpy.clip((temp_max-2*i*temp_scale)/40,0,1)),alpha=1)
-
-    ax6.scatter(back_hour,10/temp_scale*(CC_hokoon['temp']-temp_min),c=temp_cmap(numpy.clip(CC_hokoon['temp']/40,0,1)),\
-                edgecolor='none',s=1,alpha=1,zorder=1)
-    ax6.plot(back_hour,10/temp_scale*(CC_hokoon['temp']-temp_min),color='gray',zorder=0)
-
-    T241 = time.time()
-    #print(T241-T240)
-   
 def refresh_sky(i):
-    global fig, asc, CC_hokoon, count, date_UTC, date_local
+    global fig, count, date_UTC, date_local
 
-    #################################
-    # read record and put timestamp #
-    #################################       
-    CC_hokoon = pandas.read_csv(pathlib.Path.cwd().joinpath('ASC','CC_hokoon.csv'), index_col=0)
-    #print(CC_hokoon.memory_usage(deep=True))
-    CC_hokoon = CC_hokoon.append({'HKT':str(date_local.strftime('%Y/%m/%d %H:%M:%S'))}, ignore_index=True) # can't use datetime in dict
-    CC_hokoon['HKT'] = pandas.to_datetime(CC_hokoon['HKT'],yearfirst=True) # convert to datetime object
+#     #################################
+#     # read record and put timestamp #
+#     #################################       
+#     CC_hokoon = pandas.read_csv(pathlib.Path.cwd().joinpath('ASC','CC_hokoon.csv'), index_col=0)
+#     #print(CC_hokoon.memory_usage(deep=True))
+#     CC_hokoon = CC_hokoon.append({'HKT':str(date_local.strftime('%Y/%m/%d %H:%M:%S'))}, ignore_index=True) # can't use datetime in dict
+#     CC_hokoon['HKT'] = pandas.to_datetime(CC_hokoon['HKT'],yearfirst=True) # convert to datetime object
 
     ###########
     # removal #
@@ -1795,9 +1681,7 @@ def refresh_sky(i):
         ax1.clear()
         ax2.clear()
         ax3.clear()
-        ax4.clear()
         ax5.clear()
-        ax6.clear()
         timelog('Armageddon')
     except:
         timelog('survivor')
@@ -1809,32 +1693,9 @@ def refresh_sky(i):
     # update time
     date_UTC    = ts.utc(ts.now().utc_datetime().replace(second=0,microsecond=0))
     date_local  = date_UTC.astimezone(tz)
-
-    # update ASC
-#     try:
-#         try:
-#             urlretrieve('http://www.hokoon.edu.hk/weather/images/astimages/hkneac_asc.jpg', 'asc.jpg')
-#             asc = Image.open('asc.jpg')
-#             asc = asc.resize((720,480),Image.ANTIALIAS)
-#     except ContentTooShortError: # try again
-#         timelog('try again')
-#         urlretrieve('http://www.hokoon.edu.hk/weather/images/astimages/hkneac_asc.jpg', 'asc.jpg')
-#         asc = Image.open('asc.jpg')
-#         asc = asc.resize((720,480),Image.ANTIALIAS)
-#         except Exception as e:
-#             print(e)
-#             urlretrieve('http://192.168.1.222/weather/images/astimages/hkneac_asc.jpg', 'asc.jpg')
-#             asc = Image.open('asc.jpg')
-#             asc = asc.resize((720,480),Image.ANTIALIAS)
-#     except HTTPError:
-#         asc = Image.open(pathlib.Path.cwd().joinpath('ASC','serverdead.jpg'))
-#     except Exception as e:
-#         print(e)
-#         asc = Image.open(pathlib.Path.cwd().joinpath('ASC','black.jpg'))
         
     # update transformation
     update_para()
-
 
     plot_ASC()
         
@@ -1851,10 +1712,10 @@ def refresh_sky(i):
     ########################
     # save and trim record #
     ########################
-    CC_hokoon.drop(CC_hokoon[CC_hokoon['HKT'] <= datetime.now()-timedelta(hours=24)].index, inplace=True) # keep only last 24h data
-    CC_hokoon.reset_index(drop=True,inplace=True)
-
-    CC_hokoon.to_csv(pathlib.Path.cwd().joinpath('ASC','CC_hokoon.csv'))
+#     CC_hokoon.drop(CC_hokoon[CC_hokoon['HKT'] <= datetime.now()-timedelta(hours=24)].index, inplace=True) # keep only last 24h data
+#     CC_hokoon.reset_index(drop=True,inplace=True)
+# 
+#     CC_hokoon.to_csv(pathlib.Path.cwd().joinpath('ASC','CC_hokoon.csv'))
 
     end = time.time()
     timelog(str(round(end-start,2))+'s wasted')
