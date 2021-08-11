@@ -700,6 +700,17 @@ def plot_constellation():
     ########
     #紫微垣#
     ########
+    #紫微垣#
+    C_A00 = [[Cas.x[44],Cep.x[14]],[Cas.y[44],Cep.y[14]],[Cep.x[14],Dra.x[50]],[Cep.y[14],Dra.y[50]],\
+             [Dra.x[1],Dra.x[4]],[Dra.y[1],Dra.y[4]],[Dra.x[1],Dra.x[12]],[Dra.y[1],Dra.y[12]],\
+             [Dra.x[4],Dra.x[25]],[Dra.y[4],Dra.y[25]],[Dra.x[5],Dra.x[12]],[Dra.y[5],Dra.y[12]],\
+             [Dra.x[25],Dra.x[50]],[Dra.y[25],Dra.y[50]],[Cam.x[2],Cam.x[10]],[Cam.y[2],Cam.y[10]],\
+             [Cam.x[2],Cam.x[20]],[Cam.y[2],Cam.y[20]],[Cam.x[20],UMa.x[23]],[Cam.y[20],UMa.y[23]],\
+             [Dra.x[7],Dra.x[11]],[Dra.y[7],Dra.y[11]],[Dra.x[10],Dra.x[11]],[Dra.y[10],Dra.y[11]],\
+             [Dra.x[10],UMa.x[23]],[Dra.y[10],UMa.y[23]]]
+    CA00n = [numpy.mean([numpy.mean([Cep.x[14],Dra.x[50]]),numpy.mean([Cam.x[20],Dra.x[10],UMa.x[23]])]),\
+             numpy.mean([numpy.mean([Cep.y[14],Dra.y[50]]),numpy.mean([Cam.y[20],Dra.y[10],UMa.y[23]])])]
+    print(CA00n)
     #北極#
     C_A01 = [[UMi.x[1],UMi.x[2]],[UMi.y[1],UMi.y[2]],[UMi.x[1],UMi.x[4]],[UMi.y[1],UMi.y[4]],\
              [UMi.x[4],UMi.x[8]],[UMi.y[4],UMi.y[8]],[UMi.x[8],Cam.x[29]],[UMi.y[8],Cam.y[29]]]
@@ -875,7 +886,7 @@ def plot_constellation():
     C_A_list = [C_A01,C_A02,C_A03,C_A04,C_A05,C_A06,C_A07,C_A08,C_A09,C_A10,\
                 C_A11,C_A12,C_A13,C_A14,C_A15,C_A16,C_A17,C_A18,C_A19,C_A20,\
                 C_A21,C_A22,C_A23,C_A24,C_A25,C_A26,C_A27,C_A28,C_A29,C_A30,\
-                C_A31,C_A32,C_A33,C_A34,C_A35,C_A36,C_A37,C_A38,C_A39]
+                C_A31,C_A32,C_A33,C_A34,C_A35,C_A36,C_A37,C_A38,C_A39,C_A00]
 
     # 紫微垣 linecollection
     C_A_line_xy1 = []
@@ -902,7 +913,7 @@ def plot_constellation():
                 [CA21n,'內階'],[CA22n,'天廚'],[CA23n,'八穀'],[CA24n,'天棓'],[CA25n,'內廚'],\
                 [CA26n,'文昌'],[CA27n,'三師'],[CA28n,'三公'],[CA29n,'天床'],[CA30n,'太尊'],\
                 [CA31n,'天牢'],[CA32n,'太陽守'],[CA33n,'勢'],[CA34n,'相'],[CA35n,'玄戈'],\
-                [CA36n,'玄戈'],[CA37n,'北斗'],[CA38n,'輔'],[CA39n,'天槍']]
+                [CA36n,'玄戈'],[CA37n,'北斗'],[CA38n,'輔'],[CA39n,'天槍'],[CA00n,'紫微垣']]
   
 ##    for i in range(len(CAn_list)):
 ##        if len(CAn_list[i][0]) != 0:
@@ -910,6 +921,12 @@ def plot_constellation():
 ##               and max(CAn_list[i][0])-min(CAn_list[i][0]) < hori_border:
 ##                ax0.annotate(str(CAn_list[i][1]),(CAn_list[i][0][0],CAn_list[i][0][1]),color='w',\
 ##                                  fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
+
+    if len(CAn_list[-1][0]) != 0:
+        if (CAn_list[-1][0][0])**2 < (hori_border/2)**2-(CAn_list[-1][0][1])**2 \
+            and max(CAn_list[-1][0])-min(CAn_list[-1][0]) < hori_border:
+            ax0.annotate(str(CAn_list[-1][1]),(CAn_list[-1][0][0],CAn_list[-1][0][1]),color='w',\
+                         fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
 
     ########
     #太微垣#
@@ -2940,6 +2957,8 @@ def plot_ASC():
     ax0.set_ylim((-300,300))
     ax0.axis('off')
     ax0.add_patch(patches.Rectangle((-300,-300),600,600,fc='none',ec=(1,1,0,0.75),lw=2))
+    
+    ax0.annotate('Realtime Sky Map',(0,290),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
     
     plot_solar()
     plot_constellation()
