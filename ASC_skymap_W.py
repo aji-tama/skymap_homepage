@@ -1708,7 +1708,7 @@ def refresh_sky(i):
     fig.canvas.flush_events()
     #fig.savefig('Hokoon_ASIM_'+str("{:%Y_%m_%d-%H_%M_%S}".format(datetime.now()))+'.png')
     #plt.savefig('Hokoon_ASIM_'+str("{:%Y_%m_%d-%H_%M_%S}".format(datetime.now()))+'.png')
-    plt.savefig('Hokoon_skymap.png')
+    plt.savefig('Hokoon_skymap_W.png')
     #plt.close(fig)
 
     ########################
