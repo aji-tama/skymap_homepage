@@ -126,10 +126,10 @@ date_local  = date_UTC.astimezone(tz)
 # plot parameters
 image_size = 1.6
 #side_space = 6
-fig = plt.figure(figsize=(image_size*7.2,image_size*11.85), facecolor='black')
+fig = plt.figure(figsize=(image_size*7.2,image_size*12), facecolor='black')
 fig.subplots_adjust(0,0,1,1,0,0)
 
-gs = matplotlib.gridspec.GridSpec(4, 2, wspace=0, hspace=0, width_ratios=[1,1], height_ratios=[720,180,180,105])
+gs = matplotlib.gridspec.GridSpec(4, 2, wspace=0, hspace=0, width_ratios=[1,1], height_ratios=[720,180,180,120])
 
 ax0 = plt.subplot(gs[0, :])
 ax0.set_facecolor('black')
@@ -175,27 +175,22 @@ if platform == 'win32':
     DjV_S_9     = font_manager.FontProperties(fname = 'C:/WINDOWS/Fonts/DEJAVUSANS.TTF', size=9)
     DjV_S_10    = font_manager.FontProperties(fname = 'C:/WINDOWS/Fonts/DEJAVUSANS.TTF', size=10)
     DjV_S_12    = font_manager.FontProperties(fname = 'C:/WINDOWS/Fonts/DEJAVUSANS.TTF', size=12)
-    #emoji_20    = font_manager.FontProperties(fname = 'C:/WINDOWS/Fonts/YUGOTHB.TTC', size=20)
     chara_chi   = font_manager.FontProperties(fname = 'C:/WINDOWS/Fonts/YUGOTHR.TTC')
-    chara_chi_16= font_manager.FontProperties(fname = 'C:/WINDOWS/Fonts/YUGOTHR.TTC', size=16)
 elif platform == 'darwin':
     DjV_S_6     = font_manager.FontProperties(fname = '/Library/Fonts/DEJAVUSANS.TTF', size=6)
     DjV_S_8     = font_manager.FontProperties(fname = '/Library/Fonts/DEJAVUSANS.TTF', size=8)
     DjV_S_9     = font_manager.FontProperties(fname = '/Library/Fonts/DEJAVUSANS.TTF', size=9)
     DjV_S_10    = font_manager.FontProperties(fname = '/Library/Fonts/DEJAVUSANS.TTF', size=10)
     DjV_S_12    = font_manager.FontProperties(fname = '/Library/Fonts/DEJAVUSANS.TTF', size=12)
-    #emoji_20    = font_manager.FontProperties(fname = '/Library/Fonts/YUGOTHB.TTC', size=20)
     chara_chi   = font_manager.FontProperties(fname = '/Library/Fonts/SIMHEI.TTF')
-    chara_chi_16= font_manager.FontProperties(fname = '/Library/Fonts/SIMHEI.TTF', size=16)
 elif platform == 'linux':
     DjV_S_6     = font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/DejaVu Sans/DejaVu_Sans_Book.ttf', size=6)
     DjV_S_8     = font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/DejaVu Sans/DejaVu_Sans_Book.ttf', size=8)
     DjV_S_9     = font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/DejaVu Sans/DejaVu_Sans_Book.ttf', size=9)
     DjV_S_10    = font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/DejaVu Sans/DejaVu_Sans_Book.ttf', size=10)
     DjV_S_12    = font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/DejaVu Sans/DejaVu_Sans_Book.ttf', size=12)
-    #emoji_20    = font_manager.FontProperties(fname = '/usr/local/share/fonts/YuGothB.ttc', size=20)
-    chara_chi   = font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/Yu Gothic/Yu_Gothic_Bold.ttc')
-    chara_chi_16= font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/Yu Gothic/Yu_Gothic_Bold.ttc', size=16)
+    chara_chi   = font_manager.FontProperties(fname = '/home/pi/.local/share/fonts/Unknown Vendor/TrueType/SimHei/SimHei_Normal.TTF')
+
 # raw data
 horizon     = pandas.DataFrame(0,index=range(360),columns=['RA','Dec','x','y']).apply(pandas.to_numeric)
 twlight     = pandas.DataFrame(0,index=range(360),columns=['RA','Dec','x','y']).apply(pandas.to_numeric)
@@ -447,7 +442,8 @@ if debug_mode == 1:
 ####################
 
 def plot_solar():
-    global plot_alpha, hori_border, hori_xmax, hori_xmin, hori_ymax, hori_ymin, horizon_line, equator_line, ecliptic_line, twlight_line,\
+    global plot_alpha, hori_border, hori_xmax, hori_xmin, hori_ymax, hori_ymin, horizon_line, equator_line, ecliptic_line,\
+           twlight_line, twli_xmax, twli_xmin, twli_ymax, twli_ymin,\
            Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune,\
            solar_obj,solar_color,moon_chi,\
            Sun_x,Moon_x,Mercury_x,Venus_x,Mars_x,Jupiter_x,Saturn_x,Uranus_x,Neptune_x,\
@@ -524,6 +520,12 @@ def plot_solar():
     twlight_line = plt.Polygon(twlight_pt, closed=True, fill=None, edgecolor=(0,1,0,0.75), linestyle='--', zorder=0+2.5)
     ax0.add_patch(twlight_line)
 
+    # twlight size
+    twli_xmax = max(twlight_pt,key=itemgetter(0))[0]
+    twli_xmin = min(twlight_pt,key=itemgetter(0))[0]
+    twli_ymax = max(twlight_pt,key=itemgetter(1))[1]
+    twli_ymin = min(twlight_pt,key=itemgetter(1))[1]
+
     ax0.annotate('\u2212'+'18'+'\u00b0',((max(twlight.x)-min(twlight.y))/2*math.cos(math.radians(45)),(min(twlight.y)-max(twlight.x))/2*math.sin(math.radians(45))),rotation=45,ha='center',va='center',color='c', backgroundcolor= 'black', zorder=1+2.5)
     
     # equator  
@@ -577,41 +579,62 @@ def plot_solar():
     solar_pos_y = [Sun_y,Moon_y,Mercury_y,Venus_y,Mars_y,Jupiter_y,Saturn_y,Uranus_y,Neptune_y]
     solar_color = ['#FFCC33','#DAD9D7','#97979F','#C18F17','#E27B58','#C88B3A','#A49B72','#D5FBFC','#3E66F9']
     
-    solar_obj = ax0.scatter(solar_pos_x,solar_pos_y,alpha=plot_alpha+0.25,color=solar_color,zorder=4+2.5)
-    solar_leg = ax0.scatter([-160,-120,-80,-40,0,40,80,120,160],[min(twlight.y)-10]*9,alpha=plot_alpha+0.25,color=solar_color,zorder=4+2.5)
+    solar_obj = ax0.scatter(solar_pos_x,solar_pos_y,alpha=plot_alpha+0.25,color=solar_color,zorder=10+2.5)
+    solar_obj.set_clip_path(twlight_line)
+    solar_leg = ax0.scatter([-160,-120,-80,-40,0,40,80,120,160],[min(twlight.y)-10]*9,color=solar_color,zorder=4+2.5)
     
-    ax0.annotate('$\u263C$',(Sun_x+2.5,Sun_y+1),color=solar_color[0])
+    if sun_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u263C$',(Sun_x+2.5,Sun_y+1),color=solar_color[0],zorder=10+2.5)
+    if moon_vector.altaz()[0].degrees >= -18:
+        if moon_chi>180:
+            ax0.annotate('$\u263D$',(Moon_x+2.5,Moon_y+1),color=solar_color[1],zorder=10+2.5)
+        else:
+            ax0.annotate('$\u263E$',(Moon_x+2.5,Moon_y+1),color=solar_color[1],zorder=10+2.5)
+    if mercury_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u263F$',(Mercury_x+2.5,Mercury_y+1),color=solar_color[2],zorder=10+2.5)
+    if venus_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u2640$',(Venus_x+2.5,Venus_y+1),color=solar_color[3],zorder=10+2.5)
+    if mars_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u2642$',(Mars_x+2.5,Mars_y+1),color=solar_color[4],zorder=10+2.5)
+    if jupiter_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u2643$',(Jupiter_x+2.5,Jupiter_y+1),color=solar_color[5],zorder=10+2.5)
+    if saturn_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u2644$',(Saturn_x+2.5,Saturn_y+1),color=solar_color[6],zorder=10+2.5)
+    if uranus_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u2645$',(Uranus_x+2.5,Uranus_y+1),color=solar_color[7],zorder=10+2.5)
+    if neptune_vector.altaz()[0].degrees >= -18:
+        ax0.annotate('$\u2646$',(Neptune_x+2.5,Neptune_y+1),color=solar_color[8],zorder=10+2.5)
+
     ax0.annotate('$\u263C$',(-160,min(twlight.y)-15),color=solar_color[0],ha='center',va='top')
-    ax0.annotate('SUN',(-160,min(twlight.y)-25),color=solar_color[0],ha='center',va='top')
+    ax0.annotate('日',(-160,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[0],ha='center',va='top')
+    ax0.annotate('SUN',(-160,min(twlight.y)-35),color=solar_color[0],ha='center',va='top')
     if moon_chi>180:
-        ax0.annotate('$\u263D$',(Moon_x+2.5,Moon_y+1),color=solar_color[1])
         ax0.annotate('$\u263D$',(-120,min(twlight.y)-15),color=solar_color[1],ha='center',va='top')
-        ax0.annotate('MOON',(-120,min(twlight.y)-25),color=solar_color[1],ha='center',va='top')
     else:
-        ax0.annotate('$\u263E$',(Moon_x+2.5,Moon_y+1),color=solar_color[1])
         ax0.annotate('$\u263E$',(-120,min(twlight.y)-15),color=solar_color[1],ha='center',va='top')
-        ax0.annotate('MOON',(-120,min(twlight.y)-25),color=solar_color[1],ha='center',va='top')
-    ax0.annotate('$\u263F$',(Mercury_x+2.5,Mercury_y+1),color=solar_color[2])
+    ax0.annotate('月',(-120,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[1],ha='center',va='top')
+    ax0.annotate('MOON',(-120,min(twlight.y)-35),color=solar_color[1],ha='center',va='top')
     ax0.annotate('$\u263F$',(-80,min(twlight.y)-15),color=solar_color[2],ha='center',va='top')
-    ax0.annotate('MERCURY',(-80,min(twlight.y)-25),color=solar_color[2],ha='center',va='top')
-    ax0.annotate('$\u2640$',(Venus_x+2.5,Venus_y+1),color=solar_color[3])
+    ax0.annotate('水',(-80,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[2],ha='center',va='top')
+    ax0.annotate('MERCURY',(-80,min(twlight.y)-35),color=solar_color[2],ha='center',va='top')
     ax0.annotate('$\u2640$',(-40,min(twlight.y)-15),color=solar_color[3],ha='center',va='top')
-    ax0.annotate('VENUS',(-40,min(twlight.y)-25),color=solar_color[3],ha='center',va='top')
-    ax0.annotate('$\u2642$',(Mars_x+2.5,Mars_y+1),color=solar_color[4])
+    ax0.annotate('金',(-40,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[3],ha='center',va='top')
+    ax0.annotate('VENUS',(-40,min(twlight.y)-35),color=solar_color[3],ha='center',va='top')
     ax0.annotate('$\u2642$',(0,min(twlight.y)-15),color=solar_color[4],ha='center',va='top')
-    ax0.annotate('MARS',(0,min(twlight.y)-25),color=solar_color[4],ha='center',va='top')
-    ax0.annotate('$\u2643$',(Jupiter_x+2.5,Jupiter_y+1),color=solar_color[5])
+    ax0.annotate('火',(0,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[4],ha='center',va='top')
+    ax0.annotate('MARS',(0,min(twlight.y)-35),color=solar_color[4],ha='center',va='top')
     ax0.annotate('$\u2643$',(40,min(twlight.y)-15),color=solar_color[5],ha='center',va='top')
-    ax0.annotate('JUPITER',(40,min(twlight.y)-25),color=solar_color[5],ha='center',va='top')
-    ax0.annotate('$\u2644$',(Saturn_x+2.5,Saturn_y+1),color=solar_color[6])
+    ax0.annotate('木',(40,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[5],ha='center',va='top')
+    ax0.annotate('JUPITER',(40,min(twlight.y)-35),color=solar_color[5],ha='center',va='top')
     ax0.annotate('$\u2644$',(80,min(twlight.y)-15),color=solar_color[6],ha='center',va='top')
-    ax0.annotate('SATURN',(80,min(twlight.y)-25),color=solar_color[6],ha='center',va='top')
-    ax0.annotate('$\u2645$',(Uranus_x+2.5,Uranus_y+1),color=solar_color[7])
+    ax0.annotate('土',(80,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[6],ha='center',va='top')
+    ax0.annotate('SATURN',(80,min(twlight.y)-35),color=solar_color[6],ha='center',va='top')
     ax0.annotate('$\u2645$',(120,min(twlight.y)-15),color=solar_color[7],ha='center',va='top')
-    ax0.annotate('URANUS',(120,min(twlight.y)-25),color=solar_color[7],ha='center',va='top')
-    ax0.annotate('$\u2646$',(Neptune_x+2.5,Neptune_y+1),color=solar_color[8])
+    ax0.annotate('天王',(120,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[7],ha='center',va='top')
+    ax0.annotate('URANUS',(120,min(twlight.y)-35),color=solar_color[7],ha='center',va='top')
     ax0.annotate('$\u2646$',(160,min(twlight.y)-15),color=solar_color[8],ha='center',va='top')
-    ax0.annotate('NEPTUNE',(160,min(twlight.y)-25),color=solar_color[8],ha='center',va='top')
+    ax0.annotate('海王',(160,min(twlight.y)-25),fontproperties=chara_chi,fontsize=10,color=solar_color[8],ha='center',va='top')
+    ax0.annotate('NEPTUNE',(160,min(twlight.y)-35),color=solar_color[8],ha='center',va='top')
 
     if debug_mode == 1:
         timelog('ref count horizon_line: '+str(sys.getrefcount(horizon_line)))
@@ -683,17 +706,17 @@ def plot_constellation():
     # mag scale
     shift_mag = 0
     for i in range(7):
-        ax0.scatter(hori_xmin+shift_mag+i*10+5,hori_ymin+20, 5*(10**(-0.4*i))**0.5, c='white',alpha=plot_alpha,zorder=14+2.5)
-        ax0.scatter(hori_xmin+shift_mag+i*10+5,hori_ymin+20, 5*(10**(-0.4*i))**0.5+20, c='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5,hori_ymin+2),ha='center',va='bottom',color='w',zorder=14+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5-1,hori_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5,hori_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5+1,hori_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5-1,hori_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5+1,hori_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5-1,hori_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5,hori_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(hori_xmin+shift_mag+i*10+5+1,hori_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.scatter(twli_xmin+shift_mag+i*10+5,twli_ymin+20, 5*(10**(-0.4*i))**0.5, c='white',alpha=plot_alpha,zorder=14+2.5)
+        ax0.scatter(twli_xmin+shift_mag+i*10+5,twli_ymin+20, 5*(10**(-0.4*i))**0.5+20, c='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2),ha='center',va='bottom',color='w',zorder=14+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
 
     olw = 1 #text outline width
     
@@ -710,7 +733,6 @@ def plot_constellation():
              [Dra.x[10],UMa.x[23]],[Dra.y[10],UMa.y[23]]]
     CA00n = [numpy.mean([numpy.mean([Cep.x[14],Dra.x[50]]),numpy.mean([Cam.x[20],Dra.x[10],UMa.x[23]])]),\
              numpy.mean([numpy.mean([Cep.y[14],Dra.y[50]]),numpy.mean([Cam.y[20],Dra.y[10],UMa.y[23]])])]
-    print(CA00n)
     #北極#
     C_A01 = [[UMi.x[1],UMi.x[2]],[UMi.y[1],UMi.y[2]],[UMi.x[1],UMi.x[4]],[UMi.y[1],UMi.y[4]],\
              [UMi.x[4],UMi.x[8]],[UMi.y[4],UMi.y[8]],[UMi.x[8],Cam.x[29]],[UMi.y[8],Cam.y[29]]]
@@ -931,6 +953,13 @@ def plot_constellation():
     ########
     #太微垣#
     ########
+    #太微垣#
+    C_B00 = [[Com.x[19],Vir.x[1]],[Com.y[19],Vir.y[1]],[Vir.x[1],Vir.x[3]],[Vir.y[1],Vir.y[3]],\
+             [Vir.x[3],Vir.x[5]],[Vir.y[3],Vir.y[5]],[Vir.x[5],Vir.x[9]],[Vir.y[5],Vir.y[9]],\
+             [Leo.x[2],Leo.x[5]],[Leo.y[2],Leo.y[5]],[Leo.x[5],Leo.x[12]],[Leo.y[5],Leo.y[12]],\
+             [Leo.x[12],Leo.x[13]],[Leo.y[12],Leo.y[13]],[Leo.x[13],Vir.x[4]],[Leo.y[13],Vir.y[4]]]
+    CB00n = [numpy.mean([numpy.mean([Vir.x[1],Vir.x[3],Vir.x[5],Vir.x[9]]),numpy.mean([Leo.x[2],Leo.x[5],Leo.x[12],Leo.x[13],Vir.x[4]])]),\
+             numpy.mean([numpy.mean([Vir.y[1],Vir.y[3],Vir.y[5],Vir.y[9]]),numpy.mean([Leo.y[2],Leo.y[5],Leo.y[12],Leo.y[13],Vir.y[4]])])+5*labelxy]
     #太微左垣#
     C_B01 = [[Com.x[19],Vir.x[1]],[Com.y[19],Vir.y[1]],[Vir.x[1],Vir.x[3]],[Vir.y[1],Vir.y[3]],\
              [Vir.x[3],Vir.x[5]],[Vir.y[3],Vir.y[5]],[Vir.x[5],Vir.x[9]],[Vir.y[5],Vir.y[9]]]
@@ -1023,7 +1052,8 @@ def plot_constellation():
              numpy.mean([UMa.y[7],UMa.y[8],UMa.y[12],UMa.y[13],UMa.y[14],UMa.y[20]])-labelxy]
 
     C_B_list = [C_B01,C_B02,C_B03,C_B04,C_B05,C_B06,C_B07,C_B08,C_B09,C_B10,\
-                C_B11,C_B12,C_B13,C_B14,C_B15,C_B16,C_B17,C_B18,C_B19,C_B20]
+                C_B11,C_B12,C_B13,C_B14,C_B15,C_B16,C_B17,C_B18,C_B19,C_B20,\
+                C_B00]
 
     # 太微垣 linecollection
     C_B_line_xy1 = []
@@ -1046,7 +1076,8 @@ def plot_constellation():
     CBn_list = [[CB01n,'太微左垣'],[CB02n,'太微右垣'],[CB03n,'謁者'],[CB04n,'三公'],[CB05n,'九卿'],\
                 [CB06n,'五諸侯'],[CB07n,'內屏'],[CB08n,'五帝座'],[CB09n,'幸臣'],[CB10n,'太子'],\
                 [CB11n,'從官'],[CB12n,'郎將'],[CB13n,'虎賁'],[CB14n,'常陳'],[CB15n,'郎位'],\
-                [CB16n,'明堂'],[CB17n,'靈台'],[CB18n,'少微'],[CB19n,'長垣'],[CB20n,'三台']]
+                [CB16n,'明堂'],[CB17n,'靈台'],[CB18n,'少微'],[CB19n,'長垣'],[CB20n,'三台'],\
+                [CB00n,'太微垣']]
   
 ##    for i in range(len(CBn_list)):
 ##        if len(CBn_list[i][0]) != 0:
@@ -1054,10 +1085,33 @@ def plot_constellation():
 ##               and max(CBn_list[i][0])-min(CBn_list[i][0]) < hori_border:
 ##                ax0.annotate(str(CBn_list[i][1]),(CBn_list[i][0][0],CBn_list[i][0][1]),color='w',\
 ##                                  fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
+    
+    if len(CBn_list[-1][0]) != 0:
+        if (CBn_list[-1][0][0])**2 < (hori_border/2)**2-(CBn_list[-1][0][1])**2 \
+            and max(CBn_list[-1][0])-min(CBn_list[-1][0]) < hori_border:
+            ax0.annotate(str(CBn_list[-1][1]),(CBn_list[-1][0][0],CBn_list[-1][0][1]),color='w',\
+                         fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
 
     ########
     #天市垣#
     ########
+    #天市垣#
+    C_C00 = [[Aql.x[2],Her.x[75]],[Aql.y[2],Her.y[75]],[Aql.x[2],Ser.x[15]],[Aql.y[2],Ser.y[15]],\
+             [Her.x[2],Her.x[20]],[Her.y[2],Her.y[20]],[Her.x[4],Her.x[10]],[Her.y[4],Her.y[10]],\
+             [Her.x[4],Her.x[20]],[Her.y[4],Her.y[20]],[Her.x[10],Her.x[75]],[Her.y[10],Her.y[75]],\
+             [Oph.x[1],Ser.x[3]],[Oph.y[1],Ser.y[3]],[Oph.x[8],Ser.x[1]],[Oph.y[8],Ser.y[1]],\
+             [Oph.x[8],Ser.x[3]],[Oph.y[8],Ser.y[3]],[Ser.x[1],Ser.x[15]],[Ser.y[1],Ser.y[15]],\
+             [Her.x[0],Her.x[8]],[Her.y[0],Her.y[8]],[Her.x[8],Her.x[38]],[Her.y[8],Her.y[38]],\
+             [Her.x[38],Ser.x[8]],[Her.y[38],Ser.y[8]],[Oph.x[2],Oph.x[6]],[Oph.y[2],Oph.y[6]],\
+             [Oph.x[3],Ser.x[5]],[Oph.y[3],Ser.y[5]],[Oph.x[3],Oph.x[6]],[Oph.y[3],Oph.y[6]],\
+             [Ser.x[0],Ser.x[5]],[Ser.y[0],Ser.y[5]],[Ser.x[0],Ser.x[7]],[Ser.y[0],Ser.y[7]],\
+             [Ser.x[4],Ser.x[7]],[Ser.y[4],Ser.y[7]],[Ser.x[4],Ser.x[8]],[Ser.y[4],Ser.y[8]]]
+    CC00n = [numpy.mean([numpy.mean([Aql.x[2],Ser.x[15]]),\
+                         numpy.mean([Her.x[0],Her.x[8],Her.x[38],Oph.x[2],Oph.x[3],Oph.x[6],\
+                                     Ser.x[0],Ser.x[4],Ser.x[5],Ser.x[7],Ser.x[8]])]),\
+             numpy.mean([numpy.mean([Aql.y[2],Ser.y[15]]),\
+                         numpy.mean([Her.y[0],Her.y[8],Her.y[38],Oph.y[2],Oph.y[3],Oph.y[6],\
+                                     Ser.y[0],Ser.y[4],Ser.y[5],Ser.y[7],Ser.y[8]])])]           
     #天市左垣#
     C_C01 = [[Aql.x[2],Her.x[75]],[Aql.y[2],Her.y[75]],[Aql.x[2],Ser.x[15]],[Aql.y[2],Ser.y[15]],\
              [Her.x[2],Her.x[20]],[Her.y[2],Her.y[20]],[Her.x[4],Her.x[10]],[Her.y[4],Her.y[10]],\
@@ -1156,7 +1210,7 @@ def plot_constellation():
              numpy.mean([Her.y[3],Her.y[22],Her.y[26]])]
 
     C_C_list = [C_C01,C_C02,C_C03,C_C04,C_C05,C_C06,C_C07,C_C08,C_C09,C_C10,\
-                C_C11,C_C12,C_C13,C_C14,C_C15,C_C16,C_C17,C_C18,C_C19]
+                C_C11,C_C12,C_C13,C_C14,C_C15,C_C16,C_C17,C_C18,C_C19,C_C00]
 
     # 天市垣 linecollection
     C_C_line_xy1 = []
@@ -1179,7 +1233,7 @@ def plot_constellation():
     CCn_list = [[CC01n,'天市左垣'],[CC02n,'天市右垣'],[CC03n,'市樓'],[CC04n,'車肆'],[CC05n,'宗正'],\
                 [CC06n,'宗人'],[CC07n,'宗'],[CC08n,'帛度'],[CC09n,'屠肆'],[CC10n,'侯'],\
                 [CC11n,'帝座'],[CC12n,'宦者'],[CC13n,'列肆'],[CC14n,'斗'],[CC15n,'斛'],\
-                [CC16n,'貫索'],[CC17n,'七公'],[CC18n,'天紀'],[CC19n,'女床']]
+                [CC16n,'貫索'],[CC17n,'七公'],[CC18n,'天紀'],[CC19n,'女床'],[CC00n,'天市垣']]
   
 ##    for i in range(len(CCn_list)):
 ##        if len(CCn_list[i][0]) != 0:
@@ -1187,6 +1241,12 @@ def plot_constellation():
 ##               and max(CCn_list[i][0])-min(CCn_list[i][0]) < hori_border:
 ##                ax0.annotate(str(CCn_list[i][1]),(CCn_list[i][0][0],CCn_list[i][0][1]),color='w',\
 ##                                  fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
+    
+    if len(CCn_list[-1][0]) != 0:
+        if (CCn_list[-1][0][0])**2 < (hori_border/2)**2-(CCn_list[-1][0][1])**2 \
+            and max(CCn_list[-1][0])-min(CCn_list[-1][0]) < hori_border:
+            ax0.annotate(str(CCn_list[-1][1]),(CCn_list[-1][0][0],CCn_list[-1][0][1]),color='w',\
+                         fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
 
     ##########
     #東宮蒼龍#
@@ -2878,13 +2938,14 @@ def write_label(x,y,z,c1,c2,c3): # (x,y) are text offset, z is zorder, (c1,c2,c3
     if (x,y,z) == (0,0,0):
         timelog('timestamp')
     #print('label:'+str(date_local))
-    ax0.annotate(Obs[4]+'\n'+Obs[6],(hori_xmin+x,hori_ymax+y),ha='left',va='top',color=c1,zorder=12+2.5+z)
-    ax0.annotate(Obs[3]+'\n'+Obs[5],(hori_xmin+x+60,hori_ymax+y),ha='right',va='top',color=c1,zorder=12+2.5+z)
-    ax0.annotate('Ho Koon Nature Education cum\nAstronomical Centre',(hori_xmax+x,hori_ymax+y),ha='right',va='top',color=c1,zorder=12+2.5+z)
-    ax0.annotate('HKT\n\n',(hori_xmax+x,hori_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
-    ax0.annotate(str(date_local.strftime('%H:%M:%S\n')),(hori_xmax+x,hori_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
-    ax0.annotate(str(date_local.strftime('%d/%m/%Y')),(hori_xmax+x,hori_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
-    ax0.annotate('ephemeris by Skyfield',(360+x,hori_ymin+y),rotation=90,ha='right',va='bottom',color=c2,zorder=12+2.5+z)
+    ax0.annotate(Obs[4]+'\n'+Obs[6],(twli_xmin+x,twli_ymax+y),ha='left',va='top',color=c1,zorder=12+2.5+z)
+    ax0.annotate(Obs[3]+'\n'+Obs[5],(twli_xmin+x+60,twli_ymax+y),ha='right',va='top',color=c1,zorder=12+2.5+z)
+    ax0.annotate('可觀自然教育中心暨天文館',(twli_xmax+x,twli_ymax+y),ha='right',va='top',fontproperties=chara_chi,fontsize=10,color=c1,zorder=12+2.5+z)
+    ax0.annotate('Ho Koon Nature Education cum\nAstronomical Centre',(twli_xmax+x,twli_ymax+y-10),ha='right',va='top',color=c1,zorder=12+2.5+z)
+    ax0.annotate('HKT\n\n',(twli_xmax+x,twli_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
+    ax0.annotate(str(date_local.strftime('%H:%M:%S\n')),(twli_xmax+x,twli_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
+    ax0.annotate(str(date_local.strftime('%d/%m/%Y')),(twli_xmax+x,twli_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
+    ax0.annotate('ephemeris by Skyfield',(300+x,twli_ymin+y),rotation=90,ha='right',va='bottom',color=c2,zorder=12+2.5+z)
 
     txt_offset = 7
     mark_offset = 5
@@ -2923,7 +2984,8 @@ def write_weather():
     
     #sunspot
     try:
-        ax5.annotate('Sunspot no.',(1320,49),ha='center',va='center',fontproperties=DjV_S_10,color='darkgrey')
+        ax5.annotate('黑子數 ',(1300,49),ha='right',va='center',fontproperties=chara_chi,fontsize=10,color='darkgrey')
+        ax5.annotate('Sunspot no.',(1300,49),ha='left',va='center',fontproperties=DjV_S_10,color='darkgrey')
         ax5.annotate(SW_ss,(1320,19),ha='center',va='center',fontproperties=DjV_S_10,color='w')
     except:
         print('no sun la')
@@ -2958,12 +3020,13 @@ def plot_ASC():
     ax0.axis('off')
     ax0.add_patch(patches.Rectangle((-300,-300),600,600,fc='none',ec=(1,1,0,0.75),lw=2))
     
-    ax0.annotate('Realtime Sky Map',(0,290),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    ax0.annotate('即時星圖',(0,290),xycoords=('data'),ha='center',va='top',fontproperties=chara_chi,fontsize=16,color='white')
+    ax0.annotate('Realtime Sky Map',(0,279),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
     
     plot_solar()
     plot_constellation()
     plot_MW()
-    plot_boundary()
+    #plot_boundary()
     write_label(0,0,0,'w','dimgrey','y')
     write_weather()
 
@@ -2980,12 +3043,13 @@ def moon_phase(): #ax1
     timelog('drawing Moon')
     
     ax1.set_xlim((-90,90))
-    ax1.set_ylim((-90,90))
+    ax1.set_ylim((-85,95))
     ax1.axis('off')
-    ax1.add_patch(patches.Rectangle((-90,-90),180,180,fc='none',ec=(1,1,0,0.75),lw=2))
+    ax1.add_patch(patches.Rectangle((-90,-85),180,180,fc='none',ec=(1,1,0,0.75),lw=2))
     
     # Moon phase
-    ax1.annotate('Moon Phase',(0,85),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    ax1.annotate('月相',(0,90),xycoords=('data'),ha='center',va='top',fontproperties=chara_chi,fontsize=16,color='white')
+    ax1.annotate('Moon Phase',(0,84),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
 
     moon_size = math.degrees(3474.2/moon_vector.radec()[2].km)*3600
 
@@ -3134,7 +3198,7 @@ def moon_phase(): #ax1
                               ax1.get_position().width,ax1.get_position().height], projection=ccrs.Orthographic(central_longitude=lon0,central_latitude=lat0))
     ax1_moon.set_facecolor('none')
     ax1_moon.set_xlim((-90,90))
-    ax1_moon.set_ylim((-90,90))
+    ax1_moon.set_ylim((-85,95))
     ax1_moon.axis('off')
     
 #     rgba = numpy.array(Image.open(pathlib.Path.cwd().joinpath('moon_proj.png')))
@@ -3149,65 +3213,66 @@ def moon_phase(): #ax1
 
     # eq. coord.
     if moon_vector.altaz()[0].degrees > 0:
-        ax1.annotate('N',(ph_l*math.sin(Moon_parallactic_angle),ph_l*math.cos(Moon_parallactic_angle)),\
-                     xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
-        ax1.plot([ph_r*math.sin(Moon_parallactic_angle),ph_R*math.sin(Moon_parallactic_angle)],\
-                 [ph_r*math.cos(Moon_parallactic_angle),ph_R*math.cos(Moon_parallactic_angle)],color='red',zorder=10)
+        ax1_moon.annotate('N',(ph_l*math.sin(Moon_parallactic_angle),ph_l*math.cos(Moon_parallactic_angle)),\
+                          xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
+        ax1_moon.plot([ph_r*math.sin(Moon_parallactic_angle),ph_R*math.sin(Moon_parallactic_angle)],\
+                      [ph_r*math.cos(Moon_parallactic_angle),ph_R*math.cos(Moon_parallactic_angle)],color='red',zorder=10)
         
-        ax1.annotate('E',(ph_l*math.sin(Moon_parallactic_angle+3*math.pi/2),ph_l*math.cos(Moon_parallactic_angle+3*math.pi/2)),\
-                     xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
-        ax1.plot([ph_r*math.sin(Moon_parallactic_angle+3*math.pi/2),ph_R*math.sin(Moon_parallactic_angle+3*math.pi/2)],\
-                 [ph_r*math.cos(Moon_parallactic_angle+3*math.pi/2),ph_R*math.cos(Moon_parallactic_angle+3*math.pi/2)],color='red',zorder=10)
+        ax1_moon.annotate('E',(ph_l*math.sin(Moon_parallactic_angle+3*math.pi/2),ph_l*math.cos(Moon_parallactic_angle+3*math.pi/2)),\
+                          xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
+        ax1_moon.plot([ph_r*math.sin(Moon_parallactic_angle+3*math.pi/2),ph_R*math.sin(Moon_parallactic_angle+3*math.pi/2)],\
+                      [ph_r*math.cos(Moon_parallactic_angle+3*math.pi/2),ph_R*math.cos(Moon_parallactic_angle+3*math.pi/2)],color='red',zorder=10)
         
-        ax1.annotate('S',(ph_l*math.sin(Moon_parallactic_angle+math.pi),ph_l*math.cos(Moon_parallactic_angle+math.pi)),\
-                     xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
-        ax1.plot([ph_r*math.sin(Moon_parallactic_angle+math.pi),ph_R*math.sin(Moon_parallactic_angle+math.pi)],\
-                 [ph_r*math.cos(Moon_parallactic_angle+math.pi),ph_R*math.cos(Moon_parallactic_angle+math.pi)],color='red',zorder=10)
+        ax1_moon.annotate('S',(ph_l*math.sin(Moon_parallactic_angle+math.pi),ph_l*math.cos(Moon_parallactic_angle+math.pi)),\
+                          xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
+        ax1_moon.plot([ph_r*math.sin(Moon_parallactic_angle+math.pi),ph_R*math.sin(Moon_parallactic_angle+math.pi)],\
+                      [ph_r*math.cos(Moon_parallactic_angle+math.pi),ph_R*math.cos(Moon_parallactic_angle+math.pi)],color='red',zorder=10)
         
-        ax1.annotate('W',(ph_l*math.sin(Moon_parallactic_angle+math.pi/2),ph_l*math.cos(Moon_parallactic_angle+math.pi/2)),\
-                     xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
-        ax1.plot([ph_r*math.sin(Moon_parallactic_angle+math.pi/2),ph_R*math.sin(Moon_parallactic_angle+math.pi/2)],\
-                 [ph_r*math.cos(Moon_parallactic_angle+math.pi/2),ph_R*math.cos(Moon_parallactic_angle+math.pi/2)],color='red',zorder=10)
+        ax1_moon.annotate('W',(ph_l*math.sin(Moon_parallactic_angle+math.pi/2),ph_l*math.cos(Moon_parallactic_angle+math.pi/2)),\
+                          xycoords=('data'),rotation=-math.degrees(Moon_parallactic_angle),ha='center',va='center',color='red')
+        ax1_moon.plot([ph_r*math.sin(Moon_parallactic_angle+math.pi/2),ph_R*math.sin(Moon_parallactic_angle+math.pi/2)],\
+                      [ph_r*math.cos(Moon_parallactic_angle+math.pi/2),ph_R*math.cos(Moon_parallactic_angle+math.pi/2)],color='red',zorder=10)
 
     ax1.annotate('equatorial\ncoordinate',(-88,-70),xycoords=('data'),ha='left',va='bottom',fontproperties=DjV_S_9,color='red')
 
     # selenographic
     ax1.annotate('selenographic\ncoordinate',(88,-70),xycoords=('data'),ha='right',va='bottom',fontproperties=DjV_S_9,color='cyan')
 
-    ax1.annotate('N',(ph_l*math.sin(PA_axis_moon_z),ph_l*math.cos(PA_axis_moon_z)),\
-                 xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
-    ax1.plot([ph_r*math.sin(PA_axis_moon_z),ph_R*math.sin(PA_axis_moon_z)],\
-             [ph_r*math.cos(PA_axis_moon_z),ph_R*math.cos(PA_axis_moon_z)],color='cyan',zorder=10)
+    ax1_moon.annotate('N',(ph_l*math.sin(PA_axis_moon_z),ph_l*math.cos(PA_axis_moon_z)),\
+                      xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
+    ax1_moon.plot([ph_r*math.sin(PA_axis_moon_z),ph_R*math.sin(PA_axis_moon_z)],\
+                  [ph_r*math.cos(PA_axis_moon_z),ph_R*math.cos(PA_axis_moon_z)],color='cyan',zorder=10)
     
-    ax1.annotate('E',(ph_l*math.sin(PA_axis_moon_z+math.pi/2),ph_l*math.cos(PA_axis_moon_z+math.pi/2)),\
-                 xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
-    ax1.plot([ph_r*math.sin(PA_axis_moon_z+math.pi/2),ph_R*math.sin(PA_axis_moon_z+math.pi/2)],\
-             [ph_r*math.cos(PA_axis_moon_z+math.pi/2),ph_R*math.cos(PA_axis_moon_z+math.pi/2)],color='cyan',zorder=10)
+    ax1_moon.annotate('E',(ph_l*math.sin(PA_axis_moon_z+math.pi/2),ph_l*math.cos(PA_axis_moon_z+math.pi/2)),\
+                      xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
+    ax1_moon.plot([ph_r*math.sin(PA_axis_moon_z+math.pi/2),ph_R*math.sin(PA_axis_moon_z+math.pi/2)],\
+                  [ph_r*math.cos(PA_axis_moon_z+math.pi/2),ph_R*math.cos(PA_axis_moon_z+math.pi/2)],color='cyan',zorder=10)
     
-    ax1.annotate('S',(ph_l*math.sin(PA_axis_moon_z+math.pi),ph_l*math.cos(PA_axis_moon_z+math.pi)),\
-                 xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
-    ax1.plot([ph_r*math.sin(PA_axis_moon_z+math.pi),ph_R*math.sin(PA_axis_moon_z+math.pi)],\
-             [ph_r*math.cos(PA_axis_moon_z+math.pi),ph_R*math.cos(PA_axis_moon_z+math.pi)],color='cyan',zorder=10)
+    ax1_moon.annotate('S',(ph_l*math.sin(PA_axis_moon_z+math.pi),ph_l*math.cos(PA_axis_moon_z+math.pi)),\
+                      xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
+    ax1_moon.plot([ph_r*math.sin(PA_axis_moon_z+math.pi),ph_R*math.sin(PA_axis_moon_z+math.pi)],\
+                  [ph_r*math.cos(PA_axis_moon_z+math.pi),ph_R*math.cos(PA_axis_moon_z+math.pi)],color='cyan',zorder=10)
     
-    ax1.annotate('W',(ph_l*math.sin(PA_axis_moon_z+3*math.pi/2),ph_l*math.cos(PA_axis_moon_z+3*math.pi/2)),\
-                 xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
-    ax1.plot([ph_r*math.sin(PA_axis_moon_z+3*math.pi/2),ph_R*math.sin(PA_axis_moon_z+3*math.pi/2)],\
-             [ph_r*math.cos(PA_axis_moon_z+3*math.pi/2),ph_R*math.cos(PA_axis_moon_z+3*math.pi/2)],color='cyan',zorder=10)
+    ax1_moon.annotate('W',(ph_l*math.sin(PA_axis_moon_z+3*math.pi/2),ph_l*math.cos(PA_axis_moon_z+3*math.pi/2)),\
+                      xycoords=('data'),rotation=-math.degrees(PA_axis_moon_z),ha='center',va='center',color='cyan')
+    ax1_moon.plot([ph_r*math.sin(PA_axis_moon_z+3*math.pi/2),ph_R*math.sin(PA_axis_moon_z+3*math.pi/2)],\
+                  [ph_r*math.cos(PA_axis_moon_z+3*math.pi/2),ph_R*math.cos(PA_axis_moon_z+3*math.pi/2)],color='cyan',zorder=10)
     
     # zenith
     if moon_vector.altaz()[0].degrees > 0:
         ax1.arrow(0,M_d/2,0,10,color='green',head_width=5, head_length=5)
         ax1.annotate('dia = '+str(round(moon_size/60,1))+"'\nele = "+str(round(moon_vector.altaz()[0].degrees,1))+u'\N{DEGREE SIGN}',
-                     (88,70),xycoords=('data'),ha='right',va='top',fontproperties=DjV_S_12,color='orange')
+                     (58,70),xycoords=('data'),ha='left',va='top',fontproperties=DjV_S_12,color='orange')
     else:
         ax1.annotate('below horizon',(88,70),xycoords=('data'),ha='right',va='top',fontproperties=DjV_S_12,color='orange')
-    ax1.annotate('zenith',(0,68),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_12,color='green')
+    ax1.annotate('天頂 ',(0,70),xycoords=('data'),ha='right',va='center',fontproperties=chara_chi,fontsize=11,color='green')
+    ax1.annotate(' zenith',(0,70),xycoords=('data'),ha='left',va='center',fontproperties=DjV_S_12,color='green')
     
     phase_moon = 'illuminated '+str(round(Moon_percent*100,2))+'%' # projected 2D apparent area
     if Moon_percent >= 0:
-        ax1.annotate(phase_moon,(0,-85),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#F0F0F0')
+        ax1.annotate(phase_moon,(0,-80),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#F0F0F0')
     else:
-        ax1.annotate(phase_moon,(0,-85),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#94908D')
+        ax1.annotate(phase_moon,(0,-80),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#94908D')
 
     Tmp1 = time.time()
     #print(Tmp1-Tmp0)
@@ -3222,7 +3287,8 @@ def jovian_moons(): #ax2
     ax2.axis('off')
     ax2.add_patch(patches.Rectangle((-90,-45),180,90,fc='none',ec=(1,1,0,0.75),lw=2))
 
-    ax2.annotate('Jovian Moons',(0,40),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    ax2.annotate('木星衛星',(0,40),xycoords=('data'),ha='center',va='top',fontproperties=chara_chi,fontsize=16,color='white')
+    ax2.annotate('Jovian Moons',(0,34),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
 
     ra_J, dec_J, dis_J = Obs[0].at(date_UTC).observe(jupiterJ).apparent().radec()
 
@@ -3309,8 +3375,10 @@ def mercury_venus(): #ax3
     rot_pa_limb_mercury = mercury_chi-90
     rot_pa_limb_venus = venus_chi-90
 
-    ax3.annotate('Mercury',(Mercury_offsetx,40),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
-    ax3.annotate('Venus',(Venus_offsetx,40),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    ax3.annotate('水星',(Mercury_offsetx,40),xycoords=('data'),ha='center',va='top',fontproperties=chara_chi,fontsize=16,color='white')
+    ax3.annotate('Mercury',(Mercury_offsetx,34),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
+    ax3.annotate('金星',(Venus_offsetx,40),xycoords=('data'),ha='center',va='top',fontproperties=chara_chi,fontsize=16,color='white')
+    ax3.annotate('Venus',(Venus_offsetx,34),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
 
     Mercury_precent = almanac.fraction_illuminated(ephem, 'mercury', date_UTC)
     Venus_percent = almanac.fraction_illuminated(ephem, 'venus', date_UTC)
@@ -3372,6 +3440,9 @@ def mercury_venus(): #ax3
         ax3.arrow((MV_d/2-2)*math.sin(math.radians(270-rot_pa_limb_mercury))+Mercury_offsetx,(MV_d/2-2)*math.cos(math.radians(270-rot_pa_limb_mercury)),\
                   (dist_SM/3+2)*math.sin(math.radians(270-rot_pa_limb_mercury)),(dist_SM/3+2)*math.cos(math.radians(270-rot_pa_limb_mercury)),
                   shape='full',length_includes_head=True,head_width=1,color='#FFCC33')
+        ax3.annotate('$\u263C$',((MV_d/2+dist_SM/3+5)*math.sin(math.radians(270-rot_pa_limb_mercury))+Mercury_offsetx,
+                     (MV_d/2+dist_SM/3+5)*math.cos(math.radians(270-rot_pa_limb_mercury))),
+                     xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_12,color='#FFCC33')
     
     dist_SV = math.degrees(math.acos(math.sin(sun_vector.radec()[1].radians)*math.sin(venus_vector.radec()[1].radians)+math.cos(sun_vector.radec()[1].radians)*math.cos(venus_vector.radec()[1].radians)*math.cos(sun_vector.radec()[0].radians-venus_vector.radec()[0].radians)))
     ax3.annotate(str(round(dist_SV,1))+u'\N{DEGREE SIGN}\nfrom Sun',(Venus_offsetx,-25),xycoords=('data'),
@@ -3380,6 +3451,9 @@ def mercury_venus(): #ax3
         ax3.arrow((MV_d/2-2)*math.sin(math.radians(270-rot_pa_limb_venus))+Venus_offsetx,(MV_d/2-2)*math.cos(math.radians(270-rot_pa_limb_venus)),\
                   (dist_SV/3+2)*math.sin(math.radians(270-rot_pa_limb_venus)),(dist_SV/3+2)*math.cos(math.radians(270-rot_pa_limb_venus)),
                   shape='full',length_includes_head=True,head_width=1,color='#FFCC33')
+        ax3.annotate('$\u263C$',((MV_d/2+dist_SV/3+5)*math.sin(math.radians(270-rot_pa_limb_venus))+Venus_offsetx,
+                     (MV_d/2+dist_SV/3+5)*math.cos(math.radians(270-rot_pa_limb_venus))),
+                     xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_12,color='#FFCC33')
     
     ax3.annotate('illuminated '+str(round(Mercury_precent*100,2))+'%',(Mercury_offsetx,-35),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#F0F0F0')
     ax3.annotate('illuminated '+str(round(Venus_percent*100,2))+'%',(Venus_offsetx,-35),xycoords=('data'),ha='center',va='bottom',fontproperties=DjV_S_10,color='#F0F0F0')
@@ -3403,10 +3477,11 @@ def ephemeris(): #ax5
     timelog('Ephemeris')
 
     ax5.set_xlim((0,1440))
-    ax5.set_ylim((0,210))
+    ax5.set_ylim((0,240))
     ax5.axis('off')
-    ax5.add_patch(patches.Rectangle((0,0),1440,210,fc='none',ec=(1,1,0,0.75),lw=2))
+    ax5.add_patch(patches.Rectangle((0,0),1440,240,fc='none',ec=(1,1,0,0.75),lw=2))
     
+    ax5.annotate('曆表',(720,218),xycoords=('data'),ha='center',va='top',fontproperties=chara_chi,fontsize=16,color='white')
     ax5.annotate('Ephemeris',(720,195),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
     
     sym_y = 171-24
@@ -3414,10 +3489,14 @@ def ephemeris(): #ax5
     set_y = 95-12-4
     mag_y = 57-6-2
     ele_y = 19
-    ax5.annotate('next rise',(120,rise_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
-    ax5.annotate('next set',(120,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
-    ax5.annotate('magnitude',(120,mag_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
-    ax5.annotate('elevation',(120,ele_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate('next rise',(160,rise_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate(' 出',(160,rise_y),xycoords=('data'),ha='left',va='center',fontproperties=chara_chi,fontsize=10,color='white')
+    ax5.annotate('next set',(160,set_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate(' 沒',(160,set_y),xycoords=('data'),ha='left',va='center',fontproperties=chara_chi,fontsize=10,color='white')
+    ax5.annotate('magnitude',(160,mag_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate(' 星等',(160,mag_y),xycoords=('data'),ha='left',va='center',fontproperties=chara_chi,fontsize=10,color='white')
+    ax5.annotate('elevation',(160,ele_y),xycoords=('data'),ha='right',va='center',fontproperties=DjV_S_10,color='white')
+    ax5.annotate(' 仰角',(160,ele_y),xycoords=('data'),ha='left',va='center',fontproperties=chara_chi,fontsize=10,color='white')
     
     # Moon
     moon_x = 300
@@ -3549,7 +3628,8 @@ def ephemeris(): #ax5
     #ax5.annotate('Astronomical Twilight',(0,-75),xycoords=('data'),ha='center',va='top',fontproperties=DjV_S_12,color='white')
 
     sun_x = 1320
-    ax5.annotate('Astronomical\nTwilight',(sun_x,sym_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#FFCC33')
+    ax5.annotate('天文曙光',(sun_x,sym_y+11),xycoords=('data'),ha='center',va='center',fontproperties=chara_chi,fontsize=10,color='#FFCC33')
+    ax5.annotate('Astro. Twilight',(sun_x,sym_y-11),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color='#FFCC33')
 
     t_twilight, updown_twilight = almanac.find_discrete(ts.utc(ts.now().utc_datetime()),ts.utc(ts.now().utc_datetime()+timedelta(days=1.5)),
                                                         almanac.dark_twilight_day(ephem, Obs[0]-earth))
@@ -3562,7 +3642,9 @@ def ephemeris(): #ax5
                 ax5.annotate(str(ti.astimezone(tz).strftime('%X')),(sun_x,set_y),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_10,color=('green' if ti.astimezone(tz).date() > date_local.date() else 'orange'))
                 
     ax5.annotate('orange: today',(120,155),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_8,color='orange')
+    ax5.annotate(' 今',(168,155),xycoords=('data'),ha='left',va='center',fontproperties=chara_chi,fontsize=8,color='orange')
     ax5.annotate('green: tomorrow',(120,135),xycoords=('data'),ha='center',va='center',fontproperties=DjV_S_8,color='green')
+    ax5.annotate(' 明',(180,135),xycoords=('data'),ha='left',va='center',fontproperties=chara_chi,fontsize=8,color='green')
 
     Tep1 = time.time()
     #print(Tep1-Tep0)
