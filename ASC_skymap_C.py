@@ -3736,7 +3736,7 @@ if platform == 'win32':
     #ani = matplotlib.animation.FuncAnimation(fig, refresh_sky, repeat=False, interval=45000, save_count=0)
     ani = matplotlib.animation.FuncAnimation(fig, refresh_refresh_sky, repeat=False, interval=10000, save_count=0)
 else:
-    ani = matplotlib.animation.FuncAnimation(fig, refresh_refresh_sky, repeat=False, interval=44000, save_count=0)
+    ani = matplotlib.animation.FuncAnimation(fig, refresh_refresh_sky, repeat=False, interval=40000, save_count=0)
 
 timelog('backend is '+str(matplotlib.get_backend()))
 
