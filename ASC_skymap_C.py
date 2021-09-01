@@ -58,6 +58,8 @@ import feedparser
 import re
 import objgraph
 
+import rclone
+
 ##################
 #memory leak
 debug_mode = 0
@@ -3699,7 +3701,13 @@ def refresh_sky(i):
     #fig.savefig('Hokoon_ASIM_'+str("{:%Y_%m_%d-%H_%M_%S}".format(datetime.now()))+'.png')
     #plt.savefig('Hokoon_ASIM_'+str("{:%Y_%m_%d-%H_%M_%S}".format(datetime.now()))+'.png')
     plt.savefig('Hokoon_skymap_C.png')
-    #plt.close(fig)
+    
+    # upload to Dropbox
+    cfg_path = r'/home/pi/.config/rclone/rclone.conf'
+    with open(cfg_path) as f:
+        cfg = f.read()
+        
+    ULdropbox = rclone.with_config(cfg).copy('/home/pi/Desktop/Hokoon_skymap_C.png','webpage:webpage')
 
     ########################
     # save and trim record #
@@ -3736,7 +3744,7 @@ if platform == 'win32':
     #ani = matplotlib.animation.FuncAnimation(fig, refresh_sky, repeat=False, interval=45000, save_count=0)
     ani = matplotlib.animation.FuncAnimation(fig, refresh_refresh_sky, repeat=False, interval=10000, save_count=0)
 else:
-    ani = matplotlib.animation.FuncAnimation(fig, refresh_refresh_sky, repeat=False, interval=40000, save_count=0)
+    ani = matplotlib.animation.FuncAnimation(fig, refresh_refresh_sky, repeat=False, interval=35000, save_count=0)
 
 timelog('backend is '+str(matplotlib.get_backend()))
 
