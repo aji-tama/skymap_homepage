@@ -1002,7 +1002,7 @@ def write_label(x,y,z,c1,c2,c3): # (x,y) are text offset, z is zorder, (c1,c2,c3
     ax0.annotate('HKT\n\n',(twli_xmax+x,twli_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
     ax0.annotate(str(date_local.strftime('%H:%M:%S\n')),(twli_xmax+x,twli_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
     ax0.annotate(str(date_local.strftime('%d/%m/%Y')),(twli_xmax+x,twli_ymin+y),ha='right',color=c1,zorder=12+2.5+z)
-    ax0.annotate('ephemeris by Skyfield',(300+x,twli_ymin+y),rotation=90,ha='right',va='bottom',color=c2,zorder=12+2.5+z)
+    ax0.annotate('ephemeris by Skyfield (ascl:1907.024)',(300+x,twli_ymin+y),rotation=90,ha='right',va='bottom',color=c2,zorder=12+2.5+z)
 
     txt_offset = 7
     mark_offset = 5
