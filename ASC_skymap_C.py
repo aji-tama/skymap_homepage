@@ -31,6 +31,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.path as mpath
+import matplotlib.patheffects as pe
 from matplotlib import font_manager
 from matplotlib import collections as mc
 import matplotlib.animation
@@ -710,15 +711,15 @@ def plot_constellation():
     for i in range(7):
         ax0.scatter(twli_xmin+shift_mag+i*10+5,twli_ymin+20, 5*(10**(-0.4*i))**0.5, c='white',alpha=plot_alpha,zorder=14+2.5)
         ax0.scatter(twli_xmin+shift_mag+i*10+5,twli_ymin+20, 5*(10**(-0.4*i))**0.5+20, c='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2),ha='center',va='bottom',color='w',zorder=14+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
-        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
+        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2),ha='center',va='bottom',color='w',path_effects=[pe.withStroke(linewidth=1, foreground='k')],zorder=14+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2+1),ha='center',va='bottom',color='k',zorder=13+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2),ha='center',va='bottom',color='k',zorder=13+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5-1,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
+##        ax0.annotate(str(i),(twli_xmin+shift_mag+i*10+5+1,twli_ymin+2-1),ha='center',va='bottom',color='k',zorder=13+2.5)
 
     olw = 1 #text outline width
     
@@ -1521,24 +1522,24 @@ def plot_constellation():
             if (CDn_list[i][0][0])**2 < (hori_border/2)**2-((CDn_list[i][0][1]))**2 \
                and max(CDn_list[i][0])-min(CDn_list[i][0]) < hori_border:
                 if i in set([0,14,21,32,40,42,48]):
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0],CDn_list[i][0][1]),color='y',\
+                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0],CDn_list[i][0][1]),color='y',path_effects=[pe.withStroke(linewidth=1, foreground='k')],\
                                       fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=9+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]+olw,CDn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]+olw,CDn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]+olw,CDn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0],CDn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0],CDn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]-olw,CDn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]-olw,CDn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]-olw,CDn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]+olw,CDn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]+olw,CDn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]+olw,CDn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0],CDn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0],CDn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]-olw,CDn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]-olw,CDn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0]-olw,CDn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
 ##                else:
 ##                    ax0.annotate(str(CDn_list[i][1]),(CDn_list[i][0][0],CDn_list[i][0][1]),color='w',\
 ##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
@@ -2016,24 +2017,24 @@ def plot_constellation():
             if (CEn_list[i][0][0])**2 < (hori_border/2)**2-(CEn_list[i][0][1])**2 \
                and max(CEn_list[i][0])-min(CEn_list[i][0]) < hori_border:
                 if i in set([0,10,21,41,51,62,73]):
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0],CEn_list[i][0][1]),color='y',\
+                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0],CEn_list[i][0][1]),color='y',path_effects=[pe.withStroke(linewidth=1, foreground='k')],\
                                       fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=9+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]+olw,CEn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]+olw,CEn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]+olw,CEn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0],CEn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0],CEn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]-olw,CEn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]-olw,CEn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]-olw,CEn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]+olw,CEn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]+olw,CEn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]+olw,CEn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0],CEn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0],CEn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]-olw,CEn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]-olw,CEn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0]-olw,CEn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
 ##                else:
 ##                    ax0.annotate(str(CEn_list[i][1]),(CEn_list[i][0][0],CEn_list[i][0][1]),color='w',\
 ##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
@@ -2411,24 +2412,24 @@ def plot_constellation():
             if (CFn_list[i][0][0])**2 < (hori_border/2)**2-(CFn_list[i][0][1])**2 \
                and max(CFn_list[i][0])-min(CFn_list[i][0]) < hori_border:
                 if i in set([0,9,15,22,31,48,51]):
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0],CFn_list[i][0][1]),color='y',\
+                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0],CFn_list[i][0][1]),color='y',path_effects=[pe.withStroke(linewidth=1, foreground='k')],\
                                       fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=9+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]+olw,CFn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]+olw,CFn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]+olw,CFn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0],CFn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0],CFn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]-olw,CFn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]-olw,CFn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]-olw,CFn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]+olw,CFn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]+olw,CFn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]+olw,CFn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0],CFn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0],CFn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]-olw,CFn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]-olw,CFn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0]-olw,CFn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
 ##                else:
 ##                    ax0.annotate(str(CFn_list[i][1]),(CFn_list[i][0][0],CFn_list[i][0][1]),color='w',\
 ##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
@@ -2690,24 +2691,24 @@ def plot_constellation():
             if (CGn_list[i][0][0])**2 < (hori_border/2)**2-(CGn_list[i][0][1])**2 \
                and max(CGn_list[i][0])-min(CGn_list[i][0]) < hori_border:
                 if i in set([0,20,27,29,34,35,36]):
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0],CGn_list[i][0][1]),color='y',\
+                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0],CGn_list[i][0][1]),color='y',path_effects=[pe.withStroke(linewidth=1, foreground='k')],\
                                       fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=9+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]+olw,CGn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]+olw,CGn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]+olw,CGn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0],CGn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0],CGn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]-olw,CGn_list[i][0][1]+olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]-olw,CGn_list[i][0][1]),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
-                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]-olw,CGn_list[i][0][1]-olw),color='k',\
-                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]+olw,CGn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]+olw,CGn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]+olw,CGn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0],CGn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0],CGn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]-olw,CGn_list[i][0][1]+olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]-olw,CGn_list[i][0][1]),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
+##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0]-olw,CGn_list[i][0][1]-olw),color='k',\
+##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top',zorder=8+2.5)
 ##                else:
 ##                    ax0.annotate(str(CGn_list[i][1]),(CGn_list[i][0][0],CGn_list[i][0][1]),color='w',\
 ##                                      fontproperties=chara_chi,horizontalalignment='center',verticalalignment='top')
