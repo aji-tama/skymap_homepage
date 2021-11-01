@@ -9,6 +9,7 @@ Most of the astronomical calculations are done with help of [Skyfield](http://rh
 
 ## **Features**
 - starmap with realtime constellations, planets, sun and moon positions
+- moon symbol change according to its relative positve with sun
 - -18° horizon indicates the moment of astronomical twlight when the sun touch it
 - moonphase, with equatorial cardinal points and selenographic grids marked, is always shown with libration and zenith upwards, matching the orientation when you look up in the sky
 - jovian moons configuration along celestial equator with field of view indicated
